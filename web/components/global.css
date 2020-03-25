@@ -7,3 +7,20 @@ body {
 .textItalics {
   font-style: italic;
 }
+.basicWrapper {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+.basicBody {
+  display: flex;
+  height: 100%;
+  justify-content: center;
+}
+.basicColumn {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
