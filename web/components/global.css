@@ -1,0 +1,9 @@
+body {
+  background-color: #457b45;
+}
+.textBold {
+  font-weight: bold;
+}
+.textItalics {
+  font-style: italic;
+}

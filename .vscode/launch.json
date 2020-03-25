@@ -1,0 +1,30 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    // {
+    //   "type": "node",
+    //   "request": "launch",
+    //   "name": "nodemon",
+    //   "port": 9229,
+    //   "runtimeExecutable": "nodemon",
+    //   "program": "/home/d/Dropbox/my_code/ourstory/server/index.js",
+    //   "restart": false,
+    //   "console": "integratedTerminal",
+    //   "internalConsoleOptions": "neverOpen",
+    //   "skipFiles": ["<node_internals>/**"],
+    //   "ru": "npm run webdev",
+    //   "localRoot": "/home/d/Dropbox/my_code/ourstory/"
+    // },
+
+    {
+      "name": "Attach to server.js",
+      "type": "node",
+      "restart": true,
+      "request": "attach",
+      "port": 9229
+    }
+  ]
+}
