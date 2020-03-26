@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Authenticator from "./Authenticator";
 import globalStyles from "./global.css";
 import styles from "./header.css";
+import { Navbar, Button, Popover, Menu, Position } from "@blueprintjs/core";
 
 export default class Header extends React.Component {
   render() {
@@ -11,6 +12,18 @@ export default class Header extends React.Component {
 
       return (
         <div className={styles.header}>
+          <Navbar fixedToTop>
+            <Navbar>
+              <Popover content={<Menu>...</Menu>} position={Position.RIGHT_TOP}>
+                <Button
+                  className="bp3-minimal"
+                  icon="share"
+                  text="Open in..."
+                />
+              </Popover>
+            </Navbar>
+            <Navbar></Navbar>
+          </Navbar>
           <div className={styles.headerGroup}>
             <p className={styles.headerText}>MENU</p>
             <p className={styles.headerText}>
