@@ -38,22 +38,13 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        exclude: /node_modules/,
-        oneOf: [
+        use: [
+          { loader: "style-loader" },
           {
-            resourceQuery: /x/, // foo.css?x
-            use: ["css-loader", "style-loader"]
-          },
-          {
-            use: [
-              { loader: "style-loader" },
-              {
-                loader: "css-loader",
-                options: {
-                  modules: true
-                }
-              }
-            ]
+            loader: "css-loader",
+            options: {
+              modules: true
+            }
           }
         ]
       }

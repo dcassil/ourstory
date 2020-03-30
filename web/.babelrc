@@ -9,6 +9,8 @@
     "react"
   ],
   "plugins": [
-    "transform-object-rest-spread"
+    "transform-object-rest-spread",
+    // "transform-class-property-arrow-functions",
+    "transform-class-properties"
   ]
 }

@@ -7,6 +7,9 @@ body {
 .textItalics {
   font-style: italic;
 }
+.textWhite {
+  color: white !important;
+}
 .basicWrapper {
   position: absolute;
   top: 40px;

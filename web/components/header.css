@@ -6,6 +6,27 @@
   background-color: white;
 }
 
+.primaryMenu {
+  min-width: 150px !important;
+  background-color: #1c1e21 !important;
+  padding-right: 10px;
+  position: fixed !important;
+  top: 45px !important;
+  bottom: 0;
+}
+
+:global .ui.menu .ui.dropdown .menu > .item {
+  color: white !important;
+}
+
+:global .ui.menu .ui.dropdown .menu > .header {
+  color: white !important;
+}
+
+:global .ui.menu .ui.dropdown .menu > .item:hover {
+  color: rgba(255, 255, 255, 0.616) !important;
+}
+
 .headerGroup {
   display: flex;
 }

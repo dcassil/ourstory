@@ -10,7 +10,15 @@ title: <String>
 authors: [{id: user.id, userName: user.displayName}]
 creator: {id: <user.Id>, name: user.displayName}
 seed: <String> first sentece of story
-lastContent: <StoryContent>
+teaser: <string> // first 1000 characters.
+lastContent: {
+id: <number>
+createdDate: <date mills>
+fragment: <string>
+author: {id: user.id, userName: user.displayName}
+upVotes: <number>
+downVotes: <number>
+}
 content: [StoryContent]
 
 StoryContent
@@ -28,3 +36,4 @@ text: <String>
 author: {id: user.id, userName: user.displayName}
 upVotes: <number>
 downVotes: <number>
+createdDate: <Date mills>
