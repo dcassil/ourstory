@@ -32,7 +32,9 @@ router.get("/:id/fragments", function(req, res) {
 });
 
 router.post("/", requireAuthentication);
-router.post("/", function(req, res) {
+router.post("/", post);
+
+function post(req, res) {
   let storyContent = req.body;
 
   dbService
@@ -67,7 +69,7 @@ router.post("/", function(req, res) {
         );
     })
     .catch(e => exception.general(e, res));
-});
+}
 
 router.patch("/", requireAuthentication);
 router.patch("/", function(req, res) {
@@ -111,7 +113,7 @@ router.delete("/:id", function(req, res) {
 let getStoryAuth = (req, story) => {
   let storyAuthData = {
     exists: story !== undefined,
-    isCreator: story.creator === req.user.id,
+    isAuthor: story.author === req.user.id,
     isDeletable: story.fragments.length > 1
   };
 
@@ -119,7 +121,7 @@ let getStoryAuth = (req, story) => {
     res.status(404).send(new Error("No story found for the id provided"));
   }
 
-  if (!storyAuthData.isCreator) {
+  if (!storyAuthData.isAuthor) {
     res
       .status(401)
       .send(
@@ -169,3 +171,7 @@ function saveNewContentFragment(req, storyContentId) {
     downVotes: 0
   });
 }
+
+// module.exports = {
+//   post
+// };

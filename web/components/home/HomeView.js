@@ -5,11 +5,6 @@ import Body from "./HomeBody";
 
 export default class HomeView extends React.Component {
   render() {
-    return (
-      <div>
-        <Header />
-        <Body></Body>
-      </div>
-    );
+    return <Body></Body>;
   }
 }

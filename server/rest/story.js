@@ -5,6 +5,7 @@ const auth = require("../services/auth");
 const router = require("express").Router();
 const logger = require("../logger")(module);
 const exception = require("../services/exception");
+const storyHelpers = require("./storyHelpers");
 
 const requireAuthentication = auth.requireAuthentication;
 
@@ -13,7 +14,7 @@ const requireAuthentication = auth.requireAuthentication;
  *
  * title: <String>
  * authors: [{userId: user.id, userName: user.displayName}]
- * creator: {id: <user.Id>, name: user.displayName}
+ * author: {id: <user.Id>, name: user.displayName}
  * seed: <String> first sentece of story
  * content: [StoryContent]
  * **/
@@ -43,7 +44,7 @@ router.get("/:id/content", function(req, res) {
 
 router.post("/", requireAuthentication);
 router.post("/", function(req, res) {
-  const newStory = req.body;
+  let newStory = storyHelpers.getStoryDataFromBody(req.body);
 
   dbService
     .get()
@@ -52,12 +53,24 @@ router.post("/", function(req, res) {
       if (story) {
         logger.error("create new story: title existed");
         res.status(400).send("story title existed");
-      } else {
-        dbService
-          .get()
-          .post("story", newStory)
-          .then(result => res.json(result));
       }
+    })
+    .catch(() => {
+      dbService
+        .get()
+        .post("story", newStory)
+        .then(result => {
+          storyHelpers
+            .saveNewContentAndFragment(
+              result.id,
+              0,
+              req.body.user,
+              req.body.fragment
+            )
+            .then();
+          res.json(result);
+        })
+        .catch(e => exception.general(e, res));
     });
 });
 
@@ -124,7 +137,7 @@ router.delete("/:id", function(req, res) {
 let getStoryAuth = (req, story) => {
   let storyAuthData = {
     exists: story !== undefined,
-    isCreator: story.creator === req.user.id,
+    isAuthor: story.author === req.user.id,
     isDeletable: story.fragments.length > 1
   };
 
@@ -132,7 +145,7 @@ let getStoryAuth = (req, story) => {
     res.status(404).send(new Error("No story found for the id provided"));
   }
 
-  if (!storyAuthData.isCreator) {
+  if (!storyAuthData.isAuthor) {
     res
       .status(401)
       .send(

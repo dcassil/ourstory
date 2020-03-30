@@ -5,6 +5,8 @@ import HomeView from "./home/HomeView";
 import AdminView from "./admin/AdminView";
 import LoginView from "./login/LoginView";
 import SignupView from "./signup/SignupView";
+import NewStory from "./story/NewStoryView";
+import Header from "./Header";
 
 const PrivateRoute = ({ component, ...rest }) => (
   <Route
@@ -43,9 +45,11 @@ export default (
   <div>
     <Router>
       <div>
+        <Header />
         <Route exact path="/" component={HomeView} />
         <Route exact path="/login" component={LoginView} />
         <Route exact path="/signup" component={SignupView} />
+        <Route exact path="/story/new" component={NewStory} />
         <PrivateRoute path="/admin" component={AdminView} />
       </div>
     </Router>

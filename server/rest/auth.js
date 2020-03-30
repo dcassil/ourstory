@@ -25,6 +25,8 @@ router.post("/login", bruteforce.prevent, function(req, res) {
         req.brute.reset();
         res.json({
           username: account.username,
+          displayName: account.displayName,
+          id: account.id,
           roles: account.roles,
           token: authService.generateToken(account)
         });
@@ -49,6 +51,8 @@ router.get("/sync", authService.requireAuthentication, function(req, res) {
           ) {
             res.json({
               username: account.username,
+              id: account.id,
+              displayName: account.displayName,
               roles: account.roles,
               token: authService.generateToken(account)
             });

@@ -43,6 +43,7 @@ const Authenticator = {
       .then(function(response) {
         axios.defaults.headers.common["Authorization"] =
           "Bearer " + response.data.token;
+        console.log("login data", response.data);
         window.sessionStorage.setItem("account", JSON.stringify(response.data));
         successCallback && successCallback();
       })

@@ -54,7 +54,7 @@ export default class WhatsNewView extends React.Component {
                         )}
                       </Accordion.Title>
                       <Accordion.Content active={active}>
-                        {story.teaser}
+                        {story.teaser} <a>read more</a>
                       </Accordion.Content>
                     </Accordion>
                   </Card.Content>
@@ -62,38 +62,40 @@ export default class WhatsNewView extends React.Component {
                     <Feed>
                       <Feed.Event>
                         <Feed.Label></Feed.Label>
-                        <Feed.Content>
-                          <Feed.Date></Feed.Date>
-                          <Feed.Summary>
-                            <Feed.Extra text>Latest Addition</Feed.Extra>
-                            <Feed.User>
-                              {story.lastContent.author.displayName}
-                            </Feed.User>
-                            <Feed.Date>
-                              {new Date(
-                                story.lastContent.createdDate
-                              ).toLocaleDateString()}
-                            </Feed.Date>
-                          </Feed.Summary>
-                          <Feed.Extra text>
-                            {story.lastContent.fragment}
-                          </Feed.Extra>
-                          <Feed.Meta className="os-flex">
-                            <Feed.Like>
-                              <Icon name="thumbs up" />
-                              {story.lastContent.upVotes} Likes
-                            </Feed.Like>
-                            <Feed.Like>
-                              <Icon name="thumbs down" />
-                              {story.lastContent.downVotes} dislike
-                            </Feed.Like>
+                        {story.lastContent ? (
+                          <Feed.Content>
+                            <Feed.Date></Feed.Date>
+                            <Feed.Summary>
+                              <Feed.Extra text>Latest Addition</Feed.Extra>
+                              <Feed.User>
+                                {story.lastContent.author.displayName}
+                              </Feed.User>
+                              <Feed.Date>
+                                {new Date(
+                                  story.lastContent.createdDate
+                                ).toLocaleDateString()}
+                              </Feed.Date>
+                            </Feed.Summary>
+                            <Feed.Extra text>
+                              {story.lastContent.fragment}
+                            </Feed.Extra>
+                            <Feed.Meta className="os-flex">
+                              <Feed.Like>
+                                <Icon name="thumbs up" />
+                                {story.lastContent.upVotes.length} Likes
+                              </Feed.Like>
+                              <Feed.Like>
+                                <Icon name="thumbs down" />
+                                {story.lastContent.downVotes.length} dislike
+                              </Feed.Like>
 
-                            <Feed.Like className="os-flexFill os-textRight os-red">
-                              <Icon name="spy" />
-                              Report abuse
-                            </Feed.Like>
-                          </Feed.Meta>
-                        </Feed.Content>
+                              <Feed.Like className="os-flexFill os-textRight os-red">
+                                <Icon name="spy" />
+                                Report abuse
+                              </Feed.Like>
+                            </Feed.Meta>
+                          </Feed.Content>
+                        ) : null}
                       </Feed.Event>
                     </Feed>
                   </Card.Content>

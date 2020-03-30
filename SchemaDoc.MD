@@ -4,11 +4,16 @@ username
 password
 role
 displayName
+votes: {
+up: [<userId>],
+down: [<userId>]
+},
+abuseMarks: [{userId: <id>, comment: <string>, storyId: <id>, fragmentId: <id>}]
 
 Story
 title: <String>
 authors: [{id: user.id, userName: user.displayName}]
-creator: {id: <user.Id>, name: user.displayName}
+author: {id: <user.Id>, name: user.displayName}
 seed: <String> first sentece of story
 teaser: <string> // first 1000 characters.
 lastContent: {
@@ -16,10 +21,9 @@ id: <number>
 createdDate: <date mills>
 fragment: <string>
 author: {id: user.id, userName: user.displayName}
-upVotes: <number>
-downVotes: <number>
+upVotes: [<userId>]
+downVotes: [<userId>]
 }
-content: [StoryContent]
 
 StoryContent
 id: <number>
@@ -27,13 +31,12 @@ storyId: <number>
 position: <number>
 topFragment: <StoryContentFragment>
 lastFragment: <StoryContentFragment>
-fragments: [StoryContentFragment.id]
 
 StoryContentFragment
 id: <number>
 storyContentId: <number>
 text: <String>
 author: {id: user.id, userName: user.displayName}
-upVotes: <number>
-downVotes: <number>
+upVotes: [<userId>]
+downVotes: [<userId>]
 createdDate: <Date mills>
