@@ -68,25 +68,34 @@ export default class WhatsNewView extends React.Component {
                             <Feed.Summary>
                               <Feed.Extra text>Latest Addition</Feed.Extra>
                               <Feed.User>
-                                {story.lastContent.author.displayName}
+                                {
+                                  story.lastContent.topFragment.author
+                                    .displayName
+                                }
                               </Feed.User>
                               <Feed.Date>
                                 {new Date(
-                                  story.lastContent.createdDate
+                                  story.lastContent.topFragment.createdDate
                                 ).toLocaleDateString()}
                               </Feed.Date>
                             </Feed.Summary>
                             <Feed.Extra text>
-                              {story.lastContent.fragment}
+                              {story.lastContent.topFragment.fragment}
                             </Feed.Extra>
                             <Feed.Meta className="os-flex">
                               <Feed.Like>
                                 <Icon name="thumbs up" />
-                                {story.lastContent.upVotes.length} Likes
+                                {
+                                  story.lastContent.topFragment.upVotes.length
+                                }{" "}
+                                Likes
                               </Feed.Like>
                               <Feed.Like>
                                 <Icon name="thumbs down" />
-                                {story.lastContent.downVotes.length} dislike
+                                {
+                                  story.lastContent.topFragment.downVotes.length
+                                }{" "}
+                                dislike
                               </Feed.Like>
 
                               <Feed.Like className="os-flexFill os-textRight os-red">

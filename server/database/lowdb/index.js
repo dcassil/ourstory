@@ -71,7 +71,12 @@ class LowDb {
           blocker.assign({ blocked: true }).write();
 
           let target = this.lowDb.get(type);
-          let lastId = target.value().sort((a, b) => a.id * 1 < b.id * 1)[0].id;
+          let records = target.value();
+          let lastId = -1;
+
+          if (records && records.length > 0) {
+            lastId = records.sort((a, b) => a.id * 1 < b.id * 1)[0].id;
+          }
 
           item.id = lastId * 1 + 1;
           target.push(item).write();

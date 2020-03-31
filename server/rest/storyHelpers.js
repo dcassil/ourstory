@@ -4,7 +4,7 @@ const dbService = require("../services/db");
 
 function saveNewContentAndFragment(storyId, position, author, fragment) {
   let createdDate = new Date().getTime();
-  let content = { storyId, position, createdDate };
+  let content = { storyId, position, createdDate, numberOfFragments: 1 };
 
   return saveNewStoryContent(content) // save storyContent
     .then(savedContent => {
@@ -21,8 +21,40 @@ function saveNewContentAndFragment(storyId, position, author, fragment) {
         .get()
         .post("storyContentFragment", fragmentData)
         .then(savedFragment =>
-          patchStoryContent(savedContent.id, savedFragment)
+          patchStoryContent(savedContent.id, savedFragment).then(
+            patchedContent => {
+              let teaser = getTeaser(storyId);
+
+              return dbService.get().patch(
+                // update storyContent with fragment details.
+                "story",
+                { id: storyId },
+                { teaser, lastContent: { ...savedContent, ...patchedContent } }
+              );
+            }
+          )
         );
+    });
+}
+
+function getTeaser(id) {
+  dbService
+    .get()
+    .search("storyContent", { storyId: id })
+    .then(results => {
+      let teaser = "";
+
+      results.forEach(content => {
+        if (teaser.length < 500) {
+          teaser += ` ${content.topFragment.fragment}`;
+        }
+      });
+      dbService.get().patch(
+        // update storyContent with fragment details.
+        "story",
+        { id: id },
+        { teaser }
+      );
     });
 }
 

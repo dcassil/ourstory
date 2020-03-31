@@ -27,10 +27,17 @@ router.get("/", function(req, res) {
 });
 
 router.get("/:id", function(req, res) {
+  let id = req.params.id * 1;
+
   dbService
     .get()
-    .get("story", { id: req.params.id })
-    .then(story => res.json(story))
+    .get("story", { id })
+    .then(story =>
+      dbService
+        .get()
+        .search("storyContent", { storyId: id })
+        .then(content => res.json({ ...story, content }))
+    )
     .catch(e => exception.general(e, res));
 });
 
@@ -64,11 +71,12 @@ router.post("/", function(req, res) {
             .saveNewContentAndFragment(
               result.id,
               0,
-              req.body.user,
+              req.body.author,
               req.body.fragment
             )
-            .then();
-          res.json(result);
+            .then(() => {
+              res.json(result);
+            });
         })
         .catch(e => exception.general(e, res));
     });
@@ -95,28 +103,6 @@ router.patch("/", function(req, res) {
         )
         .then(() => res.sendStatus(200));
     });
-
-  story.then(story => {
-    if (existedAccount) {
-      if (!auth.validateRoles(req.body.roles)) {
-        res.status(400).send("Invalid roles");
-      } else {
-        dbService
-          .get()
-          .patch(
-            "accounts",
-            { username: req.body.username },
-            {
-              password: req.body.password,
-              roles: req.body.roles
-            }
-          )
-          .then(() => res.sendStatus(200));
-      }
-    } else {
-      res.status(400).send("Account not existed: " + req.body.username);
-    }
-  });
 });
 
 router.delete("/", requireAuthentication);

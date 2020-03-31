@@ -46,7 +46,8 @@ export default class WhatsNewView extends React.Component {
       })
       .catch(error => {
         this.setState({
-          failMessage: error.response ? error.response.data : error.message
+          failMessage: error.response ? error.response.data : error.message,
+          storySet: false
         });
       });
   };
