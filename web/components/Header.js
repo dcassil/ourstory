@@ -7,28 +7,31 @@ import { Menu, Icon, Dropdown } from "semantic-ui-react";
 
 export default class Header extends React.Component {
   render() {
-    if (Authenticator.isLoggedIn()) {
-      let isAdmin = Authenticator.isAuthorized("/admin");
+    let isLoggedIn = Authenticator.isLoggedIn();
+    let isAdmin = Authenticator.isAuthorized("/admin");
 
-      return (
-        <div className={styles.header}>
-          <Menu>
-            <Dropdown item icon="bars">
-              <Dropdown.Menu className={styles.primaryMenu}>
-                <Dropdown.Header>Text Size</Dropdown.Header>
-                <Dropdown.Item>Small</Dropdown.Item>
-                <Dropdown.Item>Medium</Dropdown.Item>
-                <Dropdown.Item>Large</Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
+    return (
+      <div className={styles.header}>
+        <Menu>
+          <Dropdown item icon="bars">
+            <Dropdown.Menu className={styles.primaryMenu}>
+              <Dropdown.Header>Text Size</Dropdown.Header>
+              <Dropdown.Item>Small</Dropdown.Item>
+              <Dropdown.Item>Medium</Dropdown.Item>
+              <Dropdown.Item>Large</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+          <Menu.Item>
+            {" "}
+            <p className={styles.headerText}>
+              {isLoggedIn
+                ? `Hello, ${Authenticator.getAccount().username}`
+                : `Welcome to Our Story`}
+            </p>
+          </Menu.Item>
+          <Menu.Menu position="right">
             <Menu.Item>
-              {" "}
-              <p className={styles.headerText}>
-                Hello, {Authenticator.getAccount().username}
-              </p>
-            </Menu.Item>
-            <Menu.Menu position="right">
-              <Menu.Item>
+              {isLoggedIn ? (
                 <Link
                   className={globalStyles.textBold}
                   onClick={Authenticator.logout}
@@ -36,42 +39,32 @@ export default class Header extends React.Component {
                 >
                   Log Out
                 </Link>
-              </Menu.Item>
-
-              {isAdmin && (
-                <Menu.Item>
-                  <Link className={globalStyles.textItalics} to="/admin">
-                    Admin
-                  </Link>
-                </Menu.Item>
+              ) : (
+                <Link className={globalStyles.textBold} to="/login">
+                  Sign In
+                </Link>
               )}
-            </Menu.Menu>
-          </Menu>
-          {/* <div className={styles.headerGroup}>
-            <p className={styles.headerText}>MENU</p>
-            <p className={styles.headerText}>
-              Hello, {Authenticator.getAccount().username}
-            </p>
-          </div>
-          <div className={styles.headerGroup}>
-            <p className={styles.headerText}>
-              <Link
-                className={globalStyles.textBold}
-                onClick={Authenticator.logout}
-                to="/"
-              >
-                Log Out
-              </Link>
-              {isAdmin && " or "}
-              {isAdmin && (
+            </Menu.Item>
+            {!isLoggedIn ? (
+              <Menu.Item>
+                <Link className={globalStyles.textItalics} to="/signup">
+                  Create a new Account
+                </Link>
+              </Menu.Item>
+            ) : null}
+            {isAdmin && (
+              <Menu.Item>
                 <Link className={globalStyles.textItalics} to="/admin">
                   Admin
                 </Link>
-              )}
-            </p>
-          </div> */}
-        </div>
-      );
+              </Menu.Item>
+            )}
+          </Menu.Menu>
+        </Menu>
+      </div>
+    );
+
+    if (Authenticator.isLoggedIn()) {
     } else {
       return (
         <Menu>

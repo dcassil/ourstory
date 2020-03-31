@@ -7,11 +7,9 @@ import WhatsNew from "./whatsNew/WhatsNewView";
 export default class HomeView extends React.Component {
   render() {
     return (
-      <div className={globalStyles.basicWrapper}>
-        <div className={globalStyles.basicBody}>
-          <div className={globalStyles.basicColumn}>
-            <WhatsNew />
-          </div>
+      <div className={globalStyles.basicBody}>
+        <div className={globalStyles.basicColumn}>
+          <WhatsNew />
         </div>
       </div>
     );

@@ -1,0 +1,9 @@
+.flexRow {
+  display: flex;
+  justify-content: space-between;
+}
+
+.rightHandLabel {
+  margin-right: 0 !important;
+  margin-left: 10px !important;
+}

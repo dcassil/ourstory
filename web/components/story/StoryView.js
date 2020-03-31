@@ -1,8 +1,11 @@
 import React from "react";
 import axios from "axios";
 import Authenticator from "../Authenticator";
+import FragmentModal from "./Components/FragmentsModal";
+import styles from "./Story.css";
 
 import { Link, Redirect } from "react-router-dom";
+import * as rrrr from "react-router-dom";
 import {
   Header,
   Container,
@@ -19,8 +22,9 @@ import {
 export default class WhatsNewView extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { loading: true };
+    this.state = { loading: true, fragments: [] };
     this.id = props.match.params.id;
+    console.log(rrrr);
   }
   componentDidMount() {
     axios
@@ -35,56 +39,77 @@ export default class WhatsNewView extends React.Component {
         });
       });
   }
+  loadModalDataAndOpen = (storyId, id) => {
+    axios
+      .get(`${API_URL}/story/${storyId * 1}/content/${id * 1}/fragments`)
+      .then(response => {
+        console.log(response);
+        this.setState({ fragments: response.data, loading: false });
+      })
+      .catch(error => {
+        this.setState({
+          failMessage: error.response ? error.response.data : error.message
+        });
+      });
+    this.setState({ isModalOpen: true, loading: true });
+  };
+  closeModal = () => {
+    this.setState({ isModalOpen: false });
+  };
   renderFragment = data => {
+    console.log("styles", styles);
     return (
-      <Grid>
-        <Grid.Row columns={10}>
-          <Grid.Column width={10}>
-            <Feed.Event key={data.id}>
-              <Feed.Content>
-                {this.state.showDetails ? (
-                  <Feed.Summary>
-                    <Feed.User>{data.topFragment.author.displayName}</Feed.User>
-                    <Feed.Date>
-                      {new Date(
-                        data.topFragment.createdDate
-                      ).toLocaleDateString()}
-                    </Feed.Date>
-                  </Feed.Summary>
-                ) : null}
-                <Feed.Extra text>
-                  <p>{data.topFragment.fragment}</p>
-                </Feed.Extra>
-                <Feed.Meta className="os-flex">
-                  <Feed.Like>
-                    <Icon name="thumbs up" />
-                    {data.topFragment.upVotes.length} Likes
-                  </Feed.Like>
-                  <Feed.Like>
-                    <Icon name="thumbs down" />
-                    {data.topFragment.downVotes.length} dislike
-                  </Feed.Like>
-                </Feed.Meta>
-              </Feed.Content>
-            </Feed.Event>
-          </Grid.Column>
-          <Grid.Column width={1}>
-            <Dropdown icon="bars" floating labeled>
-              <Dropdown.Menu inverted>
-                <Dropdown.Header content="something" />
-                <Dropdown.Item name="inbox" onClick={this.handleItemClick}>
-                  See Alternates
-                  <Label color="teal">{data.numberOfFragments || 0}</Label>
-                </Dropdown.Item>
+      <div key={data.id} className={styles.flexRow}>
+        <Feed.Event>
+          <Feed.Content>
+            {this.state.showDetails ? (
+              <Feed.Summary>
+                <Feed.User>{data.topFragment.author.displayName}</Feed.User>
+                <Feed.Date>
+                  {new Date(data.topFragment.createdDate).toLocaleDateString()}
+                </Feed.Date>
+              </Feed.Summary>
+            ) : null}
+            <Feed.Extra text>
+              <p>{data.topFragment.fragment}</p>
+            </Feed.Extra>
+            <Feed.Meta className="os-flex">
+              <Feed.Like>
+                <Icon name="thumbs up" />
+                {data.topFragment.upVotes.length} Likes
+              </Feed.Like>
+              <Feed.Like>
+                <Icon name="thumbs down" />
+                {data.topFragment.downVotes.length} dislike
+              </Feed.Like>
+            </Feed.Meta>
+          </Feed.Content>
+        </Feed.Event>
+        <Dropdown icon="bars">
+          <Dropdown.Menu>
+            <Dropdown.Header content="something" />
+            <Dropdown.Item
+              name="inbox"
+              onClick={() => {
+                this.loadModalDataAndOpen(data.storyId, data.id);
+              }}
+            >
+              See Alternates
+              <Label className={styles.rightHandLabel} color="teal">
+                {data.numberOfFragments || 0}
+              </Label>
+            </Dropdown.Item>
 
-                <Dropdown.Item name="spam" onClick={this.handleItemClick}>
-                  Add Alternate
-                </Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
-          </Grid.Column>
-        </Grid.Row>
-      </Grid>
+            <Dropdown.Item name="spam" onClick={this.handleItemClick}>
+              <Link
+                to={`/story/${this.state.story.id}#/content/${data.id}/fragment/new`}
+              >
+                Add Alternates
+              </Link>
+            </Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+      </div>
     );
   };
   render() {
@@ -104,10 +129,18 @@ export default class WhatsNewView extends React.Component {
 
     return (
       <Container text>
+        <FragmentModal
+          open={this.state.isModalOpen}
+          fragments={this.state.fragments}
+          closeCallback={this.closeModal}
+        />
         <Header as="h2">{this.state.story.title}</Header>
-        <Feed></Feed>
-        {this.state.story.content.map(c => this.renderFragment(c))}
-        <Link to="/story/content/new">Add to this story</Link>
+        <Container>
+          {this.state.story.content.map(c => this.renderFragment(c))}
+        </Container>
+        <Link to={`/story/${this.state.story.id}/content/new`}>
+          Add to this story
+        </Link>
       </Container>
     );
   }

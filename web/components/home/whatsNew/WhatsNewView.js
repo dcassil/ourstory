@@ -1,6 +1,7 @@
 import React from "react";
 import axios from "axios";
 import { Container, Card, Feed, Icon, Accordion } from "semantic-ui-react";
+import { Link } from "react-router-dom";
 
 import styles from "./WhatsNewView.css";
 
@@ -54,7 +55,8 @@ export default class WhatsNewView extends React.Component {
                         )}
                       </Accordion.Title>
                       <Accordion.Content active={active}>
-                        {story.teaser} <a>read more</a>
+                        {story.teaser}{" "}
+                        <Link to={`/story/${story.id}`}>read more</Link>
                       </Accordion.Content>
                     </Accordion>
                   </Card.Content>

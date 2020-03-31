@@ -15,7 +15,7 @@ const requireAuthentication = auth.requireAuthentication;
  * fragments: [StoryContentFragment.id]
  * **/
 
-router.get("/:id", function(req, res) {
+router.get("/:storyId/content", function(req, res) {
   dbService
     .get()
     .get("storyContent", { id: req.params.id })
@@ -23,10 +23,12 @@ router.get("/:id", function(req, res) {
     .catch(e => exception.general(e, res));
 });
 
-router.get("/:id/fragments", function(req, res) {
+router.get("/:story/content/:contentId/fragments", function(req, res) {
   dbService
     .get()
-    .get("storyContentFragment", { storyContentId: req.params.id })
+    .search("storyContentFragment", {
+      storyContentId: req.params.contentId * 1
+    })
     .then(fragments => res.json(fragments))
     .catch(e => exception.general(e, res));
 });
