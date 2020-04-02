@@ -1,9 +1,8 @@
 import React from "react";
 import { Feed, Icon, Image, Modal } from "semantic-ui-react";
 
-const ModalModalExample = props => (
+const FragmentModal = props => (
   <Modal open={props.open} onClose={props.closeCallback}>
-    <Modal.Header>Select a Photo</Modal.Header>
     <Modal.Content image>
       <Modal.Description>
         <Feed>{props.fragments.map(renderFragment)}</Feed>
@@ -40,4 +39,4 @@ function renderFragment(fragment) {
   );
 }
 
-export default ModalModalExample;
+export default FragmentModal;

@@ -41,6 +41,7 @@ class Server {
     this.app.use("/rest/signup", require("./rest/signup"));
     this.app.use("/rest/me", require("./rest/me"));
     this.app.use("/", require("./rest/common"));
+    this.app.use("/rest/story/", require("./rest/storyContentFragment"));
     this.app.use("/rest/story/", require("./rest/storyContent"));
     this.app.use("/rest/story", require("./rest/story"));
     this.app.use(

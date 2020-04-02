@@ -11,12 +11,12 @@ const requireAuthentication = auth.requireAuthentication;
  * id: <number>
  * id: <number>
  * text: <String>
- * author: {id: user.id, userName: user.displayName}
+ * author: {id: author.id, authorName: author.displayName}
  * upVotes: <number>
  * downVotes: <number>
  * **/
 
-router.get("/:id", function(req, res) {
+router.get("/:storyId/content/:contentId/fragments/:id", function(req, res) {
   dbService
     .get()
     .get("storyContentFragment", { id: req.params.id })
@@ -24,13 +24,23 @@ router.get("/:id", function(req, res) {
     .catch(e => exception.general(e, res));
 });
 
-router.post("/", requireAuthentication);
-router.post("/", function(req, res) {
+router.get("/:storyId/content/:contentId/fragments", function(req, res) {
+  dbService
+    .get()
+    .search("storyContentFragment", {
+      storyContentId: req.params.contentId
+    })
+    .then(fragments => res.json(fragments))
+    .catch(e => exception.general(e, res));
+});
+
+router.post("/:storyId/content/:contentId/fragments", requireAuthentication);
+router.post("/:storyId/content/:contentId/fragments", function(req, res) {
   let fragment = req.body;
 
   dbService
     .get()
-    .get("storyContent", { id: req.body.storyContentId })
+    .get("storyContent", { id: req.body.contentId })
     .then(storyContent => {
       if (!storyContent) {
         let message = "We could not find the storyContent";
@@ -40,8 +50,9 @@ router.post("/", function(req, res) {
       }
 
       if (
+        !auth.isAdmin(req) &&
         storyContent.lastFragment &&
-        storyContent.lastFragment.author.id === req.body.user.id
+        storyContent.lastFragment.author.id === req.user.id
       ) {
         let message =
           "You can not wrtie two fragments, back to back, on the same story";
@@ -54,23 +65,34 @@ router.post("/", function(req, res) {
         .get()
         .post("storyContentFragment", {
           // save fragment
-          author: fragment.user,
-          fragment: fragment.text,
+          author: fragment.author,
+          fragment: fragment.fragment,
           storyContentId: storyContent.id,
-          upVotes: 0,
-          downVotes: 0,
+          upVotes: "0",
+          downVotes: "0",
           lastModified: new Date().getTime(),
           createdDate: new Date().getTime()
         })
-        .then(savedFragment => {
-          dbService.get().patch(
-            "storyContent",
-            { id: storyContent.id },
-            {
-              lastFragment: savedFragment
-            }
-          );
-        });
+        .then(savedFragment =>
+          dbService
+            .get()
+            .get("storyContentFragment")
+            .then(fragments =>
+              dbService
+                .get()
+                .patch(
+                  "storyContent",
+                  { id: storyContent.id },
+                  {
+                    lastFragment: savedFragment,
+                    totalFragments: fragments.length
+                  }
+                )
+                .then(response => {
+                  res.sendStatus(200);
+                })
+            )
+        );
     })
     .catch(e => exception.general(e, res));
 });
@@ -81,7 +103,7 @@ router.patch("/", function(req, res) {
     .get()
     .get("storyContentFragment", { id: req.body.id })
     .then(fragment => {
-      checkData(req.user.id, fragment);
+      checkData(req.author.id, fragment);
       dbService
         .get()
         .patch(
@@ -105,7 +127,7 @@ router.delete("/:id", function(req, res) {
     .get()
     .get("storyContentFragment", { id: req.params.id })
     .then(fragment => {
-      checkData(req.user.id, fragment);
+      checkData(req.author.id, fragment);
       dbService
         .get()
         .delete("storyContentFragment", { id: fragment.id })
@@ -115,11 +137,11 @@ router.delete("/:id", function(req, res) {
     .catch(e => exception.general(e, res));
 });
 
-let checkData = (userId, fragment) => {
+let checkData = (authorId, fragment) => {
   let checkData = {
     exists: fragment !== undefined,
-    isAuthor: fragment.author.id === userId,
-    isDeletable: fragment.author.id === userId
+    isAuthor: fragment.author.id === authorId,
+    isDeletable: fragment.author.id === authorId
   };
 
   if (!checkData.exists) {

@@ -4,7 +4,7 @@ const dbService = require("../services/db");
 
 function saveNewContentAndFragment(storyId, position, author, fragment) {
   let createdDate = new Date().getTime();
-  let content = { storyId, position, createdDate, numberOfFragments: 1 };
+  let content = { storyId, position, createdDate, numberOfFragments: "1" };
 
   return saveNewStoryContent(content) // save storyContent
     .then(savedContent => {
@@ -12,8 +12,8 @@ function saveNewContentAndFragment(storyId, position, author, fragment) {
         fragment,
         author,
         storyContentId: savedContent.id,
-        upVotes: 0,
-        downVotes: 0,
+        upVotes: "0",
+        downVotes: "0",
         createdDate
       };
 

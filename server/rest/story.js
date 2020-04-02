@@ -27,7 +27,7 @@ router.get("/", function(req, res) {
 });
 
 router.get("/:id", function(req, res) {
-  let id = req.params.id * 1;
+  let id = req.params.id;
 
   dbService
     .get()

@@ -23,20 +23,8 @@ router.get("/:storyId/content", function(req, res) {
     .catch(e => exception.general(e, res));
 });
 
-router.get("/:story/content/:contentId/fragments", function(req, res) {
-  dbService
-    .get()
-    .search("storyContentFragment", {
-      storyContentId: req.params.contentId * 1
-    })
-    .then(fragments => res.json(fragments))
-    .catch(e => exception.general(e, res));
-});
-
-router.post("/", requireAuthentication);
-router.post("/", post);
-
-function post(req, res) {
+router.post("/:storyId/content", requireAuthentication);
+router.post("/:storyId/content", function(req, res) {
   let storyContent = req.body;
 
   dbService
@@ -71,7 +59,7 @@ function post(req, res) {
         );
     })
     .catch(e => exception.general(e, res));
-}
+});
 
 router.patch("/", requireAuthentication);
 router.patch("/", function(req, res) {
@@ -147,11 +135,11 @@ let getStoryAuth = (req, story) => {
 };
 
 module.exports = router;
-function patchStoryContent(is, fragment) {
+function patchStoryContent(id, fragment) {
   return dbService.get().patch(
     // update storyContent with fragment details.
     "storyContent",
-    { id: id },
+    { id },
     {
       topFragment: fragment,
       lastFragment: fragment
@@ -166,11 +154,13 @@ function saveNewStoryContent(storyContent) {
 function saveNewContentFragment(req, storyContentId) {
   return dbService.get().post("storyContentFragment", {
     // save fragment
-    author: req.body.user,
+    author: req.body.author,
     fragment: req.body.fragment,
     storyContentId: storyContentId,
-    upVotes: 0,
-    downVotes: 0
+    upVotes: "0",
+    downVotes: "0",
+    lastModified: new Date().getTime(),
+    createdDate: new Date().getTime()
   });
 }
 

@@ -3,9 +3,19 @@ import axios from "axios";
 import Authenticator from "../Authenticator";
 import FragmentModal from "./Components/FragmentsModal";
 import styles from "./Story.css";
+import FragmentsModalControler from "./Components/FragmentsModalControler";
+import FragmentEditModalControler from "./Components/FragmentEditModalControler";
+import ContentEditModalControler from "./Components/ContentEditModalControler";
 
-import { Link, Redirect } from "react-router-dom";
-import * as rrrr from "react-router-dom";
+import {
+  Link,
+  Redirect,
+  useRouteMatch,
+  Switch,
+  Route,
+  useParams
+} from "react-router-dom";
+
 import {
   Header,
   Container,
@@ -16,19 +26,19 @@ import {
   Popup,
   Label,
   Dropdown,
-  Grid
+  Grid,
+  Checkbox
 } from "semantic-ui-react";
 
 export default class WhatsNewView extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { loading: true, fragments: [] };
+    this.state = { loading: true, fragments: [], showMeta: false };
     this.id = props.match.params.id;
-    console.log(rrrr);
   }
   componentDidMount() {
     axios
-      .get(`${API_URL}/story/${this.id * 1}`)
+      .get(`${API_URL}/story/${this.id}`)
       .then(response => {
         console.log(response);
         this.setState({ story: response.data, loading: false });
@@ -39,9 +49,13 @@ export default class WhatsNewView extends React.Component {
         });
       });
   }
-  loadModalDataAndOpen = (storyId, id) => {
+  loadModalDataAndOpen = p => {
+    console.log("modal props", p);
+    if (this.state.loading || this.state.isModalOpen) {
+      return null;
+    }
     axios
-      .get(`${API_URL}/story/${storyId * 1}/content/${id * 1}/fragments`)
+      .get(`${API_URL}/story/${storyId}/content/${id}/fragments`)
       .then(response => {
         console.log(response);
         this.setState({ fragments: response.data, loading: false });
@@ -57,12 +71,11 @@ export default class WhatsNewView extends React.Component {
     this.setState({ isModalOpen: false });
   };
   renderFragment = data => {
-    console.log("styles", styles);
     return (
       <div key={data.id} className={styles.flexRow}>
         <Feed.Event>
           <Feed.Content>
-            {this.state.showDetails ? (
+            {this.state.showMeta ? (
               <Feed.Summary>
                 <Feed.User>{data.topFragment.author.displayName}</Feed.User>
                 <Feed.Date>
@@ -73,16 +86,18 @@ export default class WhatsNewView extends React.Component {
             <Feed.Extra text>
               <p>{data.topFragment.fragment}</p>
             </Feed.Extra>
-            <Feed.Meta className="os-flex">
-              <Feed.Like>
-                <Icon name="thumbs up" />
-                {data.topFragment.upVotes.length} Likes
-              </Feed.Like>
-              <Feed.Like>
-                <Icon name="thumbs down" />
-                {data.topFragment.downVotes.length} dislike
-              </Feed.Like>
-            </Feed.Meta>
+            {this.state.showMeta ? (
+              <Feed.Meta className="os-flex">
+                <Feed.Like>
+                  <Icon name="thumbs up" />
+                  {data.topFragment.upVotes.length} Likes
+                </Feed.Like>
+                <Feed.Like>
+                  <Icon name="thumbs down" />
+                  {data.topFragment.downVotes.length} dislike
+                </Feed.Like>
+              </Feed.Meta>
+            ) : null}
           </Feed.Content>
         </Feed.Event>
         <Dropdown icon="bars">
@@ -91,18 +106,20 @@ export default class WhatsNewView extends React.Component {
             <Dropdown.Item
               name="inbox"
               onClick={() => {
-                this.loadModalDataAndOpen(data.storyId, data.id);
+                this.props.history.push(
+                  `${this.props.match.url}/content/${data.id}/fragments`
+                );
               }}
             >
               See Alternates
               <Label className={styles.rightHandLabel} color="teal">
-                {data.numberOfFragments || 0}
+                {data.totalFragments ? data.totalFragments + 1 : 1}
               </Label>
             </Dropdown.Item>
 
             <Dropdown.Item name="spam" onClick={this.handleItemClick}>
               <Link
-                to={`/story/${this.state.story.id}#/content/${data.id}/fragment/new`}
+                to={`${this.props.match.url}/content/${data.id}/fragments/new`}
               >
                 Add Alternates
               </Link>
@@ -112,7 +129,14 @@ export default class WhatsNewView extends React.Component {
       </div>
     );
   };
+  toggleMeta = () =>
+    this.setState(prevState => ({ showMeta: !prevState.showMeta }));
+  log(props) {
+    console.log("log", props);
+  }
   render() {
+    console.log(this.props);
+    // console.log(match);
     if (this.state.loading) {
       return (
         <Dimmer active>
@@ -129,12 +153,38 @@ export default class WhatsNewView extends React.Component {
 
     return (
       <Container text>
+        <Switch>
+          <Route exact path={`${this.props.match.path}/content/new`}>
+            {props => <ContentEditModalControler {...props} />}
+          </Route>
+          <Route
+            exact
+            path={`${this.props.match.path}/content/:contentId/fragments`}
+          >
+            {props => <FragmentsModalControler {...props} />}
+          </Route>
+          <Route
+            exact
+            path={`${this.props.match.path}/content/:contentId/fragments/new`}
+          >
+            {props => <FragmentEditModalControler {...props} />}
+          </Route>
+        </Switch>
         <FragmentModal
           open={this.state.isModalOpen}
           fragments={this.state.fragments}
           closeCallback={this.closeModal}
         />
-        <Header as="h2">{this.state.story.title}</Header>
+        <Container className={styles.flexRow}>
+          <Header as="h2">{this.state.story.title}</Header>
+          <Checkbox
+            toggle
+            label="Show Details"
+            onChange={this.toggleMeta}
+            checked={this.state.showMeta}
+          ></Checkbox>
+        </Container>
+
         <Container>
           {this.state.story.content.map(c => this.renderFragment(c))}
         </Container>
