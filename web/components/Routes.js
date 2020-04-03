@@ -1,5 +1,11 @@
 import React, { PropTypes } from "react";
-import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Redirect,
+  Switch,
+} from "react-router-dom";
+import PrivateRoute from "@components/PrivateRoute";
 import Authenticator from "./Authenticator";
 import HomeView from "./home/HomeView";
 import AdminView from "./admin/AdminView";
@@ -12,37 +18,9 @@ import StoryView from "./story/StoryView";
 import Header from "./Header";
 import globalStyles from "./global.css";
 
-const PrivateRoute = ({ component, ...rest }) => (
-  <Route
-    {...rest}
-    render={function(props) {
-      if (!Authenticator.isLoggedIn()) {
-        return (
-          <Redirect
-            to={{
-              pathname: "/",
-              state: { from: props.location }
-            }}
-          />
-        );
-      }
-
-      if (!Authenticator.isAuthorized(props.location.pathname)) {
-        return (
-          <div>
-            <h1>Access denied</h1>
-          </div>
-        );
-      }
-
-      return React.createElement(component, props);
-    }}
-  />
-);
-
 Authenticator.setRules({
-  "/": ["ADMIN", "USER"],
-  "/admin": ["ADMIN"]
+  "/admin": ["ADMIN"],
+  "/story/new": ["ADMIN", "USER"],
 });
 
 export default (
@@ -51,11 +29,14 @@ export default (
       <div id="3">
         <Header />
         <div id="4" className={globalStyles.basicWrapper}>
-          <Route exact path="/" component={HomeView} />
-          <Route exact path="/login" component={LoginView} />
-          <Route exact path="/signup" component={SignupView} />
-          <Route exact path="/story/new" component={NewStory} />
-          <Route path="/story/:id" component={StoryView} />
+          <Switch>
+            <Route exact path="/" component={HomeView} />
+            <Route exact path="/login" component={LoginView} />
+            <Route exact path="/signup" component={SignupView} />
+            <PrivateRoute exact path="/story/new" component={NewStory} />
+            <Route path="/story/:id" component={StoryView} />
+          </Switch>
+
           {/* <Route
             exact
             path="/story/:id/content/new"

@@ -1,8 +1,8 @@
-import axios from "axios";
+import api from "@services/api";
 import _ from "lodash";
 
 function logout() {
-  axios.defaults.headers.common["Authorization"] = undefined;
+  api.defaults.headers.common["Authorization"] = undefined;
   window.sessionStorage.removeItem("account");
 }
 
@@ -12,11 +12,10 @@ const Authenticator = {
     const accountStr = window.sessionStorage.getItem("account");
     if (accountStr) {
       const account = JSON.parse(accountStr);
-      axios.defaults.headers.common["Authorization"] =
-        "Bearer " + account.token;
+      api.defaults.headers.common["Authorization"] = "Bearer " + account.token;
     }
 
-    axios
+    api
       .get(API_URL + "/auth/sync")
       .then(function(response) {
         if (response.data.token) {
@@ -38,10 +37,10 @@ const Authenticator = {
       });
   },
   login: function(username, password, successCallback, errorCallback) {
-    axios
+    api
       .post(API_URL + "/auth/login", { username: username, password: password })
       .then(function(response) {
-        axios.defaults.headers.common["Authorization"] =
+        api.defaults.headers.common["Authorization"] =
           "Bearer " + response.data.token;
         console.log("login data", response.data);
         window.sessionStorage.setItem("account", JSON.stringify(response.data));

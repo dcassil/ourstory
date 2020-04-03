@@ -15,22 +15,22 @@ const requireAuthentication = auth.requireAuthentication;
  * fragments: [StoryContentFragment.id]
  * **/
 
-router.get("/:storyId/content", function(req, res) {
+router.get("/:storyId/content", function (req, res) {
   dbService
     .get()
     .get("storyContent", { id: req.params.id })
-    .then(storyContent => res.json(storyContent))
-    .catch(e => exception.general(e, res));
+    .then((storyContent) => res.json(storyContent))
+    .catch((e) => exception.general(e, res));
 });
 
 router.post("/:storyId/content", requireAuthentication);
-router.post("/:storyId/content", function(req, res) {
+router.post("/:storyId/content", function (req, res) {
   let storyContent = req.body;
 
   dbService
     .get()
     .get("story", { id: req.body.storyId })
-    .then(story => {
+    .then((story) => {
       if (!story) {
         let message = "We could not find the story";
 
@@ -50,23 +50,23 @@ router.post("/:storyId/content", function(req, res) {
       }
 
       return saveNewStoryContent(storyContent) // save storyContent
-        .then(savedContent =>
-          saveNewContentFragment(req, savedContent.id).then(savedFragment =>
-            patchStoryContent(savedContent.id, savedFragment).then(result =>
-              res.json(result)
+        .then((savedContent) =>
+          saveNewContentFragment(req, savedContent.id).then((savedFragment) =>
+            patchStoryContent(savedContent.id, savedFragment).then((result) =>
+              res.json({ ...savedContent, ...result })
             )
           )
         );
     })
-    .catch(e => exception.general(e, res));
+    .catch((e) => exception.general(e, res));
 });
 
 router.patch("/", requireAuthentication);
-router.patch("/", function(req, res) {
+router.patch("/", function (req, res) {
   dbService
     .get()
     .get("storyContent", { id: req.body.id })
-    .then(story => {
+    .then((story) => {
       getStoryAuth(req, story);
 
       return dbService
@@ -77,7 +77,7 @@ router.patch("/", function(req, res) {
           {
             title: req.body.title,
             seed: req.body.seed,
-            lastModified: new Date().getTime()
+            lastModified: new Date().getTime(),
           }
         )
         .then(() => res.sendStatus(200));
@@ -85,15 +85,15 @@ router.patch("/", function(req, res) {
 });
 
 router.delete("/", requireAuthentication);
-router.delete("/:id", function(req, res) {
+router.delete("/:id", function (req, res) {
   dbService
     .get()
     .get("storyContent", { id: req.params.id })
-    .then(story => {
+    .then((story) => {
       getStoryAuth(req, story);
       return story.delete().then(() => res.sendStatus(200));
     })
-    .catch(error => res.status(500).send(error));
+    .catch((error) => res.status(500).send(error));
 
   // .delete("accounts", { username: req.params.id })
   // .then(() => res.sendStatus(200))
@@ -104,7 +104,7 @@ let getStoryAuth = (req, story) => {
   let storyAuthData = {
     exists: story !== undefined,
     isAuthor: story.author === req.user.id,
-    isDeletable: story.fragments.length > 1
+    isDeletable: story.fragments.length > 1,
   };
 
   if (!storyAuthData.exists) {
@@ -142,7 +142,7 @@ function patchStoryContent(id, fragment) {
     { id },
     {
       topFragment: fragment,
-      lastFragment: fragment
+      lastFragment: fragment,
     }
   );
 }
@@ -160,7 +160,7 @@ function saveNewContentFragment(req, storyContentId) {
     upVotes: "0",
     downVotes: "0",
     lastModified: new Date().getTime(),
-    createdDate: new Date().getTime()
+    createdDate: new Date().getTime(),
   });
 }
 

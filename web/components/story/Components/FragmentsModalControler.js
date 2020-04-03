@@ -1,5 +1,5 @@
 import React from "react";
-import axios from "axios";
+import api from "@services/api";
 // import Authenticator from "../Authenticator";
 import FragmentModal from "./FragmentsModal";
 
@@ -26,7 +26,7 @@ export default class FragmentsModalControler extends React.Component {
       return;
     }
 
-    axios
+    api
       .get(`${API_URL}/story/${storyId}/content/${id}/fragments`)
       .then(response => {
         console.log(response);

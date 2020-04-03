@@ -28,3 +28,14 @@ body {
   flex-direction: column;
   justify-content: center;
 }
+
+.storyPanel {
+  display: flex;
+  height: calc(100vh - 100px);
+  justify-content: center;
+}
+
+.storyColumn {
+  overflow-y: auto;
+  overflow-x: hidden;
+}

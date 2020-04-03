@@ -3,7 +3,7 @@
 import React from "react";
 import { Redirect } from "react-router-dom";
 import Authenticator from "../Authenticator";
-import axios from "axios";
+import api from "@services/api";
 import moment from "moment";
 import CSSModules from "react-css-modules";
 import styles from "./signup.css";
@@ -36,7 +36,7 @@ class LoginView extends React.Component {
       password: that.state.password
     };
 
-    axios
+    api
       .post(API_URL + "/signup", newAccount)
       .then(function(response) {
         that.resetState();

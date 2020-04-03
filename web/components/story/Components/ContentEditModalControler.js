@@ -1,5 +1,5 @@
 import React from "react";
-import axios from "axios";
+import api from "@services/api";
 import Authenticator from "../../Authenticator";
 import FragmentForm from "../Forms/FragmentForm";
 import { Modal } from "semantic-ui-react";
@@ -27,47 +27,45 @@ export default class FragmentsModalControler extends React.Component {
       return;
     }
 
-    axios
+    api
       .get(`${API_URL}/story/${storyId}/content/${id}/fragments`)
-      .then(response => {
+      .then((response) => {
         console.log(response);
         this.setState({
           fragments: response.data,
           loading: false,
           loaded: true,
-          loadedContentId: this.props.match.params.id
+          loadedContentId: this.props.match.params.id,
         });
       })
-      .catch(error => {
+      .catch((error) => {
         this.setState({
-          failMessage: error.response ? error.response.data : error.message
+          failMessage: error.response ? error.response.data : error.message,
         });
       });
     this.setState({ open: true, loading: true });
   };
   closeModal = () => {
     this.setState({ open: false });
-    this.props.history.push(
-      `/story/${this.props.match.params.id}/content/${this.props.match.params.contentId}/fragments`
-    );
+    this.props.history.push(`/story/${this.props.match.params.id}`);
   };
-  onSave = values => {
+  onSave = (values) => {
     let user = Authenticator.getAccount();
     let fragment = {
       storyId: this.props.match.params.id,
       author: { id: user.id, displayName: user.displayName },
       fragment: values.fragment,
-      createdDate: new Date().getTime()
+      createdDate: new Date().getTime(),
     };
 
-    return axios
+    return api
       .post(`${API_URL}/story/${this.props.match.params.id}/content/`, fragment)
       .then(this.closeModal)
       .catch(console.warn);
   };
   render() {
     return (
-      <Modal open={this.state.open} onClose={this.closeModal}>
+      <Modal open={this.state.open} onClose={() => this.closeModal()}>
         <Modal.Content>
           <Modal.Description>
             <FragmentForm

@@ -1,5 +1,5 @@
 import React from "react";
-import axios from "axios";
+import api from "@services/api";
 import _ from "lodash";
 // import { BootstrapTable, TableHeaderColumn } from "react-bootstrap-table";
 
@@ -21,20 +21,20 @@ export default class AccountsView extends React.Component {
   //   onAfterSaveCell(row, cellName, cellValue) {
   //     const that = this;
   //     row.roles = _.split(row.roles, ",");
-  //     axios.patch(API_URL + "/accounts", row).then(function() {
+  //     api.patch(API_URL + "/accounts", row).then(function() {
   //       that.refresh();
   //     });
   //   }
 
   //   onDeleteRow(rows) {
   //     rows.forEach(function(username) {
-  //       axios.delete(API_URL + "/accounts/" + username);
+  //       api.delete(API_URL + "/accounts/" + username);
   //     });
   //   }
 
   refresh() {
     const that = this;
-    axios.get(API_URL + "/accounts").then(function(response) {
+    api.get(API_URL + "/accounts").then(function(response) {
       that.setState({ accounts: response.data });
     });
   }

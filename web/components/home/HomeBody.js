@@ -7,8 +7,8 @@ import WhatsNew from "./whatsNew/WhatsNewView";
 export default class HomeView extends React.Component {
   render() {
     return (
-      <div className={globalStyles.basicBody}>
-        <div className={globalStyles.basicColumn}>
+      <div className={globalStyles.storyPanel}>
+        <div className={globalStyles.storyColumn}>
           <WhatsNew />
         </div>
       </div>

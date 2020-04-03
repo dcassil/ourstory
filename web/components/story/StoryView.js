@@ -1,5 +1,5 @@
 import React from "react";
-import axios from "axios";
+import api from "@services/api";
 import Authenticator from "../Authenticator";
 import FragmentModal from "./Components/FragmentsModal";
 import styles from "./Story.css";
@@ -13,7 +13,7 @@ import {
   useRouteMatch,
   Switch,
   Route,
-  useParams
+  useParams,
 } from "react-router-dom";
 
 import {
@@ -27,7 +27,7 @@ import {
   Label,
   Dropdown,
   Grid,
-  Checkbox
+  Checkbox,
 } from "semantic-ui-react";
 
 export default class WhatsNewView extends React.Component {
@@ -37,40 +37,40 @@ export default class WhatsNewView extends React.Component {
     this.id = props.match.params.id;
   }
   componentDidMount() {
-    axios
+    api
       .get(`${API_URL}/story/${this.id}`)
-      .then(response => {
+      .then((response) => {
         console.log(response);
         this.setState({ story: response.data, loading: false });
       })
-      .catch(error => {
+      .catch((error) => {
         this.setState({
-          failMessage: error.response ? error.response.data : error.message
+          failMessage: error.response ? error.response.data : error.message,
         });
       });
   }
-  loadModalDataAndOpen = p => {
-    console.log("modal props", p);
-    if (this.state.loading || this.state.isModalOpen) {
-      return null;
-    }
-    axios
-      .get(`${API_URL}/story/${storyId}/content/${id}/fragments`)
-      .then(response => {
-        console.log(response);
-        this.setState({ fragments: response.data, loading: false });
-      })
-      .catch(error => {
-        this.setState({
-          failMessage: error.response ? error.response.data : error.message
-        });
-      });
-    this.setState({ isModalOpen: true, loading: true });
-  };
-  closeModal = () => {
-    this.setState({ isModalOpen: false });
-  };
-  renderFragment = data => {
+  // loadModalDataAndOpen = p => {
+  //   console.log("modal props", p);
+  //   if (this.state.loading || this.state.isModalOpen) {
+  //     return null;
+  //   }
+  //   api
+  //     .get(`${API_URL}/story/${storyId}/content/${id}/fragments`)
+  //     .then(response => {
+  //       console.log(response);
+  //       this.setState({ fragments: response.data, loading: false });
+  //     })
+  //     .catch(error => {
+  //       this.setState({
+  //         failMessage: error.response ? error.response.data : error.message
+  //       });
+  //     });
+  //   this.setState({ isModalOpen: true, loading: true });
+  // };
+  // closeModal = () => {
+  //   this.setState({ isModalOpen: false });
+  // };
+  renderFragment = (data) => {
     return (
       <div key={data.id} className={styles.flexRow}>
         <Feed.Event>
@@ -130,7 +130,7 @@ export default class WhatsNewView extends React.Component {
     );
   };
   toggleMeta = () =>
-    this.setState(prevState => ({ showMeta: !prevState.showMeta }));
+    this.setState((prevState) => ({ showMeta: !prevState.showMeta }));
   log(props) {
     console.log("log", props);
   }
@@ -155,26 +155,26 @@ export default class WhatsNewView extends React.Component {
       <Container text>
         <Switch>
           <Route exact path={`${this.props.match.path}/content/new`}>
-            {props => <ContentEditModalControler {...props} />}
+            {(props) => <ContentEditModalControler {...props} />}
           </Route>
           <Route
             exact
             path={`${this.props.match.path}/content/:contentId/fragments`}
           >
-            {props => <FragmentsModalControler {...props} />}
+            {(props) => <FragmentsModalControler {...props} />}
           </Route>
           <Route
             exact
             path={`${this.props.match.path}/content/:contentId/fragments/new`}
           >
-            {props => <FragmentEditModalControler {...props} />}
+            {(props) => <FragmentEditModalControler {...props} />}
           </Route>
         </Switch>
-        <FragmentModal
+        {/* <FragmentModal
           open={this.state.isModalOpen}
           fragments={this.state.fragments}
           closeCallback={this.closeModal}
-        />
+        /> */}
         <Container className={styles.flexRow}>
           <Header as="h2">{this.state.story.title}</Header>
           <Checkbox
@@ -186,7 +186,7 @@ export default class WhatsNewView extends React.Component {
         </Container>
 
         <Container>
-          {this.state.story.content.map(c => this.renderFragment(c))}
+          {this.state.story.content.map((c) => this.renderFragment(c))}
         </Container>
         <Link to={`/story/${this.state.story.id}/content/new`}>
           Add to this story

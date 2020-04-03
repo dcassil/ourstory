@@ -1,5 +1,5 @@
 import React from "react";
-import axios from "axios";
+import api from "@services/api";
 import Authenticator from "../Authenticator";
 
 import { Link, Redirect } from "react-router-dom";
@@ -21,7 +21,7 @@ export default class NewStoryContentView extends React.Component {
     this.state = { loading: true };
   }
   componentDidMount() {
-    axios.get(API_URL + "/story", story).then(response => {
+    api.get(API_URL + "/story", story).then(response => {
       this.setState({ story: response.data, loading: false });
     });
   }
@@ -44,7 +44,7 @@ export default class NewStoryContentView extends React.Component {
       fragment: this.values.fragment,
       createdDate: new Date().getTime()
     };
-    axios
+    api
       .post(API_URL + "/story", story)
       .then(response => {
         console.log(response);

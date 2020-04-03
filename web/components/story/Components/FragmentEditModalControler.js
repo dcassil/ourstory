@@ -1,5 +1,5 @@
 import React from "react";
-import axios from "axios";
+import api from "@services/api";
 import Authenticator from "../../Authenticator";
 import FragmentForm from "../Forms/FragmentForm";
 import { Modal } from "semantic-ui-react";
@@ -27,7 +27,7 @@ export default class FragmentsModalControler extends React.Component {
       return;
     }
 
-    axios
+    api
       .get(`${API_URL}/story/${storyId}/content/${id}/fragments`)
       .then(response => {
         console.log(response);
@@ -60,7 +60,7 @@ export default class FragmentsModalControler extends React.Component {
       createdDate: new Date().getTime()
     };
 
-    return axios
+    return api
       .post(
         `${API_URL}/story/${values.storyId}/content/${values.contentId}/fragments`,
         fragment

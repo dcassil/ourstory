@@ -31,7 +31,7 @@ module.exports = {
     return jwt.sign(
       { data: encrypt(JSON.stringify(account)) },
       config.server.auth.secret,
-      { expiresIn: "1h" }
+      { expiresIn: "5d" }
     );
   },
   validateRoles: function(roles) {
@@ -45,6 +45,15 @@ module.exports = {
     if (token) {
       jwt.verify(token, config.server.auth.secret, function(err, decoded) {
         if (err) {
+          if (err.expiredAt) {
+            return res
+              .status(401)
+              .json({
+                success: false,
+                message: "Login Expired",
+                reason: "expired"
+              });
+          }
           return res
             .status(401)
             .json({ success: false, message: "Failed to authenticate token." });
