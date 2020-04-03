@@ -1,6 +1,6 @@
 import React from "react";
 import api from "@services/api";
-import StoryCard from "@components/home/whatsNew/StoryCard";
+import StoryCard from "@components/story/Components/StoryCard";
 import NewStoryButton from "@components/home/whatsNew/NewStoryButton";
 import { Container, Card } from "semantic-ui-react";
 
@@ -25,30 +25,26 @@ export default class WhatsNewView extends React.Component {
   };
   render() {
     const { activeTeaser } = this.state;
+    return (
+      <Container text>
+        <Card.Group>
+          {this.state.stories && this.state.stories.length > 0
+            ? this.state.stories.map((story) => {
+                let active = activeTeaser === story.id;
 
-    console.log("rendering with", this.state);
-    if (this.state.stories && this.state.stories.length > 0) {
-      console.log("rendering stories");
-      return (
-        <Container text>
-          <Card.Group>
-            {this.state.stories.map((story) => {
-              let active = activeTeaser === story.id;
-
-              return (
-                <StoryCard
-                  key={story.id}
-                  story={story}
-                  active={active}
-                  onExpand={() => this.handleAccoridanClick(story.id)}
-                />
-              );
-            })}
-            <NewStoryButton />
-          </Card.Group>
-        </Container>
-      );
-    }
-    return <div>No stories</div>;
+                return (
+                  <StoryCard
+                    key={story.id}
+                    story={story}
+                    active={active}
+                    onExpand={() => this.handleAccoridanClick(story.id)}
+                  />
+                );
+              })
+            : null}
+          <NewStoryButton />
+        </Card.Group>
+      </Container>
+    );
   }
 }

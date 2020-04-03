@@ -23,7 +23,7 @@ import {
   Dimmer,
   Loader,
   Feed,
-  Popup,
+  Card,
   Label,
   Dropdown,
   Grid,
@@ -37,6 +37,9 @@ export default class WhatsNewView extends React.Component {
     this.id = props.match.params.id;
   }
   componentDidMount() {
+    this.fetch();
+  }
+  fetch() {
     api
       .get(`${API_URL}/story/${this.id}`)
       .then((response) => {
@@ -49,6 +52,10 @@ export default class WhatsNewView extends React.Component {
         });
       });
   }
+  shouldRefetch = () => {
+    this.fetch();
+  };
+
   // loadModalDataAndOpen = p => {
   //   console.log("modal props", p);
   //   if (this.state.loading || this.state.isModalOpen) {
@@ -71,35 +78,14 @@ export default class WhatsNewView extends React.Component {
   //   this.setState({ isModalOpen: false });
   // };
   renderFragment = (data) => {
+    let author = data.topFragment.author;
+    let text = data.topFragment.fragment;
+    let createdDate = data.topFragment.createdDate;
+    let upVotes = data.topFragment.upVotes.length;
+    let downVotes = data.topFragment.downVotes.length;
     return (
       <div key={data.id} className={styles.flexRow}>
-        <Feed.Event>
-          <Feed.Content>
-            {this.state.showMeta ? (
-              <Feed.Summary>
-                <Feed.User>{data.topFragment.author.displayName}</Feed.User>
-                <Feed.Date>
-                  {new Date(data.topFragment.createdDate).toLocaleDateString()}
-                </Feed.Date>
-              </Feed.Summary>
-            ) : null}
-            <Feed.Extra text>
-              <p>{data.topFragment.fragment}</p>
-            </Feed.Extra>
-            {this.state.showMeta ? (
-              <Feed.Meta className="os-flex">
-                <Feed.Like>
-                  <Icon name="thumbs up" />
-                  {data.topFragment.upVotes.length} Likes
-                </Feed.Like>
-                <Feed.Like>
-                  <Icon name="thumbs down" />
-                  {data.topFragment.downVotes.length} dislike
-                </Feed.Like>
-              </Feed.Meta>
-            ) : null}
-          </Feed.Content>
-        </Feed.Event>
+        {this.renderContent(author, createdDate, text, upVotes, downVotes)}
         <Dropdown icon="bars">
           <Dropdown.Menu>
             <Dropdown.Header content="something" />
@@ -131,9 +117,50 @@ export default class WhatsNewView extends React.Component {
   };
   toggleMeta = () =>
     this.setState((prevState) => ({ showMeta: !prevState.showMeta }));
+  renderContent(author, createdDate, text, upVotes, downVotes) {
+    return (
+      <Feed.Event>
+        <Feed.Content>
+          {this.state.showMeta ? (
+            <Feed.Summary>
+              <Feed.User>{author.displayName}</Feed.User>
+              <Feed.Date>
+                {new Date(createdDate).toLocaleDateString()}
+              </Feed.Date>
+            </Feed.Summary>
+          ) : null}
+          <Feed.Extra text>
+            <p>{text}</p>
+          </Feed.Extra>
+          {this.state.showMeta ? (
+            <Feed.Meta className="os-flex">
+              <Feed.Like>
+                <Icon name="thumbs up" />
+                {upVotes} Likes
+              </Feed.Like>
+              <Feed.Like>
+                <Icon name="thumbs down" />
+                {downVotes} dislike
+              </Feed.Like>
+            </Feed.Meta>
+          ) : null}
+        </Feed.Content>
+      </Feed.Event>
+    );
+  }
+
   log(props) {
     console.log("log", props);
   }
+  renderSeed = (story) => {
+    return this.renderContent(
+      story.author,
+      story.createdDate,
+      story.seed,
+      story.upVotes,
+      story.downVotes
+    );
+  };
   render() {
     console.log(this.props);
     // console.log(match);
@@ -153,44 +180,59 @@ export default class WhatsNewView extends React.Component {
 
     return (
       <Container text>
-        <Switch>
-          <Route exact path={`${this.props.match.path}/content/new`}>
-            {(props) => <ContentEditModalControler {...props} />}
-          </Route>
-          <Route
-            exact
-            path={`${this.props.match.path}/content/:contentId/fragments`}
-          >
-            {(props) => <FragmentsModalControler {...props} />}
-          </Route>
-          <Route
-            exact
-            path={`${this.props.match.path}/content/:contentId/fragments/new`}
-          >
-            {(props) => <FragmentEditModalControler {...props} />}
-          </Route>
-        </Switch>
-        {/* <FragmentModal
+        <Card fluid className={styles.storyCard}>
+          <Card.Content>
+            <Switch>
+              <Route exact path={`${this.props.match.path}/content/new`}>
+                {(props) => (
+                  <ContentEditModalControler
+                    {...props}
+                    shouldRefetch={this.shouldRefetch}
+                  />
+                )}
+              </Route>
+              <Route
+                exact
+                path={`${this.props.match.path}/content/:contentId/fragments`}
+              >
+                {(props) => <FragmentsModalControler {...props} />}
+              </Route>
+              <Route
+                exact
+                path={`${this.props.match.path}/content/:contentId/fragments/new`}
+              >
+                {(props) => (
+                  <FragmentEditModalControler
+                    {...props}
+                    shouldRefetch={this.shouldRefetch}
+                  />
+                )}
+              </Route>
+            </Switch>
+            {/* <FragmentModal
           open={this.state.isModalOpen}
           fragments={this.state.fragments}
           closeCallback={this.closeModal}
         /> */}
-        <Container className={styles.flexRow}>
-          <Header as="h2">{this.state.story.title}</Header>
-          <Checkbox
-            toggle
-            label="Show Details"
-            onChange={this.toggleMeta}
-            checked={this.state.showMeta}
-          ></Checkbox>
-        </Container>
+            <Container className={styles.flexRow}>
+              <Header as="h2">{this.state.story.title}</Header>
+              <Checkbox
+                toggle
+                label="Show Details"
+                onChange={this.toggleMeta}
+                checked={this.state.showMeta}
+              ></Checkbox>
+            </Container>
 
-        <Container>
-          {this.state.story.content.map((c) => this.renderFragment(c))}
-        </Container>
-        <Link to={`/story/${this.state.story.id}/content/new`}>
-          Add to this story
-        </Link>
+            <Container>
+              {this.renderSeed(this.state.story)}
+              {this.state.story.content.map((c) => this.renderFragment(c))}
+            </Container>
+            <Link to={`/story/${this.state.story.id}/content/new`}>
+              Add to this story
+            </Link>
+          </Card.Content>
+        </Card>
       </Container>
     );
   }

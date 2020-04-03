@@ -60,7 +60,10 @@ export default class FragmentsModalControler extends React.Component {
 
     return api
       .post(`${API_URL}/story/${this.props.match.params.id}/content/`, fragment)
-      .then(this.closeModal)
+      .then(() => {
+        this.props.shouldRefetch();
+        this.closeModal();
+      })
       .catch(console.warn);
   };
   render() {

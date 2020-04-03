@@ -30,7 +30,7 @@ const ContentForm = (props) => {
       <Form.Field required>
         <label>Seed</label>
         <input
-          maxlength="1000"
+          maxLength="1000"
           minLength="50"
           name="seed"
           onChange={(e) =>

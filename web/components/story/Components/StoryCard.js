@@ -1,10 +1,11 @@
 import React from "react";
 import { Card, Feed, Icon, Accordion } from "semantic-ui-react";
 import { Link } from "react-router-dom";
+import styles from "../Story.css";
 
 export default function StoryCard({ story, active, onExpand }) {
   return (
-    <Card fluid>
+    <Card fluid className={styles.storyCard}>
       <Card.Content>
         <Card.Header>{story.title}</Card.Header>
       </Card.Content>

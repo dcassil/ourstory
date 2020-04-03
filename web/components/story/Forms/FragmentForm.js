@@ -25,7 +25,7 @@ const ContentForm = (props) => {
       <Form.Field name="title">
         <label>What happens next?</label>
         <input
-          maxlength="1000"
+          maxLength="1000"
           minLength="50"
           name="fragment"
           onChange={(e) =>

@@ -29,18 +29,18 @@ export default class FragmentsModalControler extends React.Component {
 
     api
       .get(`${API_URL}/story/${storyId}/content/${id}/fragments`)
-      .then(response => {
+      .then((response) => {
         console.log(response);
         this.setState({
           fragments: response.data,
           loading: false,
           loaded: true,
-          loadedContentId: this.props.match.params.id
+          loadedContentId: this.props.match.params.id,
         });
       })
-      .catch(error => {
+      .catch((error) => {
         this.setState({
-          failMessage: error.response ? error.response.data : error.message
+          failMessage: error.response ? error.response.data : error.message,
         });
       });
     this.setState({ open: true, loading: true });
@@ -51,13 +51,13 @@ export default class FragmentsModalControler extends React.Component {
       `/story/${this.props.match.params.id}/content/${this.props.match.params.contentId}/fragments`
     );
   };
-  onSave = values => {
+  onSave = (values) => {
     let user = Authenticator.getAccount();
     let fragment = {
       contentId: values.contentId,
       author: { id: user.id, displayName: user.displayName },
       fragment: values.fragment,
-      createdDate: new Date().getTime()
+      createdDate: new Date().getTime(),
     };
 
     return api
@@ -65,7 +65,10 @@ export default class FragmentsModalControler extends React.Component {
         `${API_URL}/story/${values.storyId}/content/${values.contentId}/fragments`,
         fragment
       )
-      .then(this.closeModal)
+      .then(() => {
+        this.props.shouldRefetch();
+        this.closeModal();
+      })
       .catch(console.warn);
   };
   render() {

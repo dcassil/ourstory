@@ -2,7 +2,7 @@ import React from "react";
 import { Card, Feed, Icon, Accordion } from "semantic-ui-react";
 import { Link } from "react-router-dom";
 
-export default function StoryCard({ story, active }) {
+export default function NewStoryButton({ story, active }) {
   return (
     <Card fluid>
       <Card.Content>

@@ -12,7 +12,7 @@ import {
   Container,
   Card,
   TextArea,
-  Label,
+  Segment,
 } from "semantic-ui-react";
 
 export default class NewStoryView extends React.Component {
@@ -124,87 +124,81 @@ export default class NewStoryView extends React.Component {
 
   renderFragmentForm() {
     return (
-      <Card.Content>
-        <Form noValidate>
-          <Form.Field
-            required
-            control={TextArea}
-            key="fragment"
-            label="Fragment"
-            name="fragment"
-            error={this.state.errors.fragment}
-            style={{ minHeight: 100 }}
-            value={this.state.values.fragment}
-            onChange={(e) => this.handleChange(e.target)}
-            placeholder="As the creator, you get to add the first fragment as well, this will help to point your story in the direction you want"
-          />
-          <Button type="submit" onClick={this.handleSubmit}>
-            Submit
-          </Button>
-          <Button onClick={() => this.setState({ storySet: false })}>
-            back
-          </Button>
-        </Form>
-      </Card.Content>
+      <Form inverted noValidate>
+        <Form.Field
+          required
+          control={TextArea}
+          key="fragment"
+          label="Fragment"
+          name="fragment"
+          error={this.state.errors.fragment}
+          style={{ minHeight: 100 }}
+          value={this.state.values.fragment}
+          onChange={(e) => this.handleChange(e.target)}
+          placeholder="As the creator, you get to add the first fragment as well, this will help to point your story in the direction you want"
+        />
+        <Button type="submit" onClick={this.handleSubmit}>
+          Submit
+        </Button>
+        <Button onClick={() => this.setState({ storySet: false })}>back</Button>
+      </Form>
     );
   }
   renderStoryForm() {
     return (
-      <Card.Content>
-        <Form noValidate>
-          <Form.Field
-            label="Title"
-            control={Input}
-            required
-            name="title"
-            maxLength="100"
-            required
-            minLength="5"
-            name="title"
-            value={this.state.values.title}
-            onChange={(e) => this.handleChange(e.target)}
-            placeholder="Setting a good title can help direct the path the story takes"
-            error={this.state.errors.title}
-          />
-          <Form.Field
-            control={Input}
-            label="Seed"
-            required
-            error={this.state.errors.seed}
-            maxLength="1000"
-            required
-            minLength="50"
-            name="seed"
-            value={this.state.values.seed}
-            onChange={(e) => this.handleChange(e.target)}
-            placeholder="What are the opening few lines of the story?"
-          />
-          <Form.Field
-            className={styles.flexRowLeft}
-            control={(props) => (
-              <React.Fragment>
-                <Checkbox {...props} />
-                <p className={styles.checkboxLabel}>You must agree to the</p>
-                <a className="" href="/terms" target="blank">
-                  Terms of Service
-                </a>
-              </React.Fragment>
-            )}
-            required
-            name="terms"
-            checked={this.state.values.terms}
-            onChange={(e) =>
-              this.handleChange({
-                name: "terms",
-                value: !this.state.values.terms,
-              })
-            }
-          ></Form.Field>
-          <Button type="submit" onClick={this.handleNext}>
-            Next
-          </Button>
-        </Form>
-      </Card.Content>
+      <Form inverted noValidate>
+        <Form.Field
+          label="Title"
+          control={Input}
+          required
+          name="title"
+          maxLength="100"
+          required
+          minLength="5"
+          name="title"
+          value={this.state.values.title}
+          onChange={(e) => this.handleChange(e.target)}
+          placeholder="Setting a good title can help direct the path the story takes"
+          error={this.state.errors.title}
+        />
+        <Form.Field
+          control={Input}
+          label="Seed"
+          required
+          error={this.state.errors.seed}
+          maxLength="1000"
+          required
+          minLength="50"
+          name="seed"
+          value={this.state.values.seed}
+          onChange={(e) => this.handleChange(e.target)}
+          placeholder="What are the opening few lines of the story?"
+        />
+        <Form.Field
+          className={styles.flexRowLeft}
+          control={(props) => (
+            <React.Fragment>
+              <Checkbox {...props} />
+              <p className={styles.checkboxLabel}>You must agree to the</p>
+              <a className="" href="/terms" target="blank">
+                Terms of Service
+              </a>
+            </React.Fragment>
+          )}
+          required
+          name="terms"
+          checked={this.state.values.terms}
+          onChange={(e) =>
+            this.handleChange({
+              name: "terms",
+              value: !this.state.values.terms,
+            })
+          }
+        ></Form.Field>
+        <Button type="submit" onClick={this.handleNext}>
+          Next
+        </Button>
+      </Form>
     );
   }
   render() {
@@ -218,16 +212,17 @@ export default class NewStoryView extends React.Component {
         />
       );
     }
-    if (this.state.storySet) {
-      return (
-        <Container text>
-          <Card fluid>{this.renderFragmentForm()}</Card>
-        </Container>
-      );
-    }
     return (
       <Container text>
-        <Card fluid>{this.renderStoryForm()}</Card>
+        <Card fluid>
+          <Card.Content>
+            {this.state.storySet ? (
+              <Segment inverted>{this.renderFragmentForm()}</Segment>
+            ) : (
+              <Segment inverted>{this.renderStoryForm()}</Segment>
+            )}
+          </Card.Content>
+        </Card>
       </Container>
     );
   }
