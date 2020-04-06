@@ -5,13 +5,16 @@
   "repository": "git@github.com:akivamu/simple-lern-boilerplate.git",
   "author": "akivamu",
   "license": "MIT",
+  "engines": {
+    "node": "10.19.0"
+  },
   "scripts": {
     "test": "export NODE_ENV=test && mocha server-test/index.js",
     "dev": "export NODE_ENV=development && nodemon --inspect index 9229",
     "webdev": "export NODE_ENV=development",
     "build:web": "export NODE_ENV=production && rimraf web/dist && webpack -p --config web/webpack.prod.config.js --progress --profile --colors",
     "prestart": "npm install",
-    "start": "node index"
+    "start": "export NODE_ENV=production && node index"
   },
   "dependencies": {
     "axios": "^0.19.2",
