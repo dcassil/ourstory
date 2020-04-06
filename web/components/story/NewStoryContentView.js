@@ -37,7 +37,7 @@ export default class NewStoryContentView extends React.Component {
       createdDate: new Date().getTime(),
     };
     api
-      .post(`${API_URL}/story/${this.id}/content`, story)
+      .post(`${API_URL}/content`, story)
       .then((response) => {
         console.log(response);
         this.setState({ succussId: true });

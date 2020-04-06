@@ -4,6 +4,7 @@ const dbService = require("../services/db");
 const auth = require("../services/auth");
 const exception = require("../services/exception");
 const router = require("express").Router();
+const storyHelpers = require("./storyHelpers");
 
 const requireAuthentication = auth.requireAuthentication;
 
@@ -12,11 +13,11 @@ const requireAuthentication = auth.requireAuthentication;
  * id: <number>
  * text: <String>
  * author: {id: author.id, authorName: author.displayName}
- * upVotes: <number>
- * downVotes: <number>
+ * upVotes: <Array>
+ * downVotes: <Array>
  * **/
 
-router.get("/:storyId/content/:contentId/fragments/:id", function (req, res) {
+router.get("/:id", function (req, res) {
   dbService
     .get()
     .get("storyContentFragment", { id: req.params.id })
@@ -24,77 +25,48 @@ router.get("/:storyId/content/:contentId/fragments/:id", function (req, res) {
     .catch((e) => exception.general(e, res));
 });
 
-router.get("/:storyId/content/:contentId/fragments", function (req, res) {
+router.post("/:id/upvote", requireAuthentication);
+router.post("/:id/upvote", function (req, res) {
   dbService
     .get()
-    .search("storyContentFragment", {
-      storyContentId: req.params.contentId,
-    })
-    .then((fragments) => res.json(fragments))
-    .catch((e) => exception.general(e, res));
-});
-
-router.post("/:storyId/content/:contentId/fragments", requireAuthentication);
-router.post("/:storyId/content/:contentId/fragments", function (req, res) {
-  let fragment = req.body;
-
-  dbService
-    .get()
-    .get("storyContent", { id: req.body.contentId })
-    .then((storyContent) => {
-      if (!storyContent) {
-        let message = "We could not find the storyContent";
-
-        exception.log(message);
-        res.status(404).send(message);
-      }
-
-      if (
-        !auth.isAdmin(req) &&
-        storyContent.lastFragment &&
-        storyContent.lastFragment.author.id === req.user.id
-      ) {
-        let message =
-          "You can not wrtie two fragments, back to back, on the same story";
-
-        exception.log(message);
-        res.status(403).send(message);
-      }
-
+    .get("storyContentFragment", { id: req.body.id })
+    .then((fragment) => {
       dbService
         .get()
-        .post("storyContentFragment", {
-          // save fragment
-          author: fragment.author,
-          fragment: fragment.fragment,
-          storyContentId: storyContent.id,
-          upVotes: "0",
-          downVotes: "0",
-          lastModified: new Date().getTime(),
-          createdDate: new Date().getTime(),
+        .patch("storyContentFragment", {
+          upVotes: fragment.upVotes.push(req.user.id),
         })
-        .then((savedFragment) =>
-          dbService
-            .get()
-            .search("storyContentFragment", { storyContentId: storyContent.id })
-            .then((fragments) =>
-              dbService
-                .get()
-                .patch(
-                  "storyContent",
-                  { id: storyContent.id },
-                  {
-                    lastFragment: savedFragment,
-                    totalFragments: fragments.length,
-                  }
-                )
-                .then((response) => {
-                  res.sendStatus(200);
-                })
-            )
-        );
-    })
-    .catch((e) => exception.general(e, res));
+        .then(() => {
+          storyHelpers.evaluateContentVotes(
+            req.body.contentId,
+            req.body.id,
+            "up"
+          );
+          res.json(fragment);
+        });
+    });
+});
+
+router.post("/:id/downvote", requireAuthentication);
+router.post("/:id/downvote", function (req, res) {
+  dbService
+    .get()
+    .get("storyContentFragment", { id: req.body.id })
+    .then((fragment) => {
+      dbService
+        .get()
+        .patch("storyContentFragment", {
+          downVotes: fragment.downVotes.push(req.user.id),
+        })
+        .then((fragment) => {
+          storyHelpers.evaluateContentVotes(
+            req.body.contentId,
+            req.body.id,
+            "down"
+          );
+          res.json(fragment);
+        });
+    });
 });
 
 router.patch("/", requireAuthentication);

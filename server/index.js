@@ -14,7 +14,7 @@ class Server {
 
     this.app = express();
 
-    this.app.all("*", function(req, res, next) {
+    this.app.all("*", function (req, res, next) {
       res.header("Access-Control-Allow-Credentials", true);
       res.header("Access-Control-Allow-Origin", "*");
       res.header(
@@ -28,7 +28,7 @@ class Server {
       next();
     });
 
-    this.app.options("*", function(req, res, next) {
+    this.app.options("*", function (req, res, next) {
       res.sendStatus(200);
     });
 
@@ -41,8 +41,8 @@ class Server {
     this.app.use("/rest/signup", require("./rest/signup"));
     this.app.use("/rest/me", require("./rest/me"));
     this.app.use("/", require("./rest/common"));
-    this.app.use("/rest/story/", require("./rest/storyContentFragment"));
-    this.app.use("/rest/story/", require("./rest/storyContent"));
+    this.app.use("/rest/fragments", require("./rest/storyContentFragment"));
+    this.app.use("/rest/content", require("./rest/storyContent"));
     this.app.use("/rest/story", require("./rest/story"));
     this.app.use(
       "/rest/storyContentFragment",

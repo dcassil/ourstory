@@ -1,17 +1,21 @@
 import React from "react";
 import { Feed, Icon, Image, Modal } from "semantic-ui-react";
+import Likes from "@components/story/Components/UpVote";
+import Dislikes from "@components/story/Components/DownVote";
 
-const FragmentModal = props => (
-  <Modal open={props.open} onClose={props.closeCallback}>
+const FragmentModal = ({ open, fragments, closeCallback, onChange }) => (
+  <Modal open={open} onClose={closeCallback}>
     <Modal.Content image>
       <Modal.Description>
-        <Feed>{props.fragments.map(renderFragment)}</Feed>
+        <Feed>
+          {fragments.map((fragment) => renderFragment(fragment, onChange))}
+        </Feed>
       </Modal.Description>
     </Modal.Content>
   </Modal>
 );
 
-function renderFragment(fragment) {
+function renderFragment(fragment, onChange) {
   return (
     <Feed.Event key={fragment.id}>
       <Feed.Content>
@@ -25,14 +29,18 @@ function renderFragment(fragment) {
           <p>{fragment.fragment}</p>
         </Feed.Extra>
         <Feed.Meta className="os-flex">
-          <Feed.Like>
-            <Icon name="thumbs up" />
-            {fragment.upVotes.length} Likes
-          </Feed.Like>
-          <Feed.Like>
-            <Icon name="thumbs down" />
-            {fragment.downVotes.length} dislike
-          </Feed.Like>
+          <Likes
+            contentId={fragment.storyContentId}
+            fragmentId={fragment.id}
+            count={fragment.upVotes.length}
+            onChange={onChange}
+          />
+          <Dislikes
+            contentId={fragment.storyContentId}
+            fragmentId={fragment.id}
+            count={fragment.downVotes.length}
+            onChange={onChange}
+          />
         </Feed.Meta>
       </Feed.Content>
     </Feed.Event>

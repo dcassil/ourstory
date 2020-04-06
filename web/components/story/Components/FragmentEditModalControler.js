@@ -28,7 +28,7 @@ export default class FragmentsModalControler extends React.Component {
     }
 
     api
-      .get(`${API_URL}/story/${storyId}/content/${id}/fragments`)
+      .get(`${API_URL}/content/${id}/fragments`)
       .then((response) => {
         console.log(response);
         this.setState({
@@ -61,10 +61,7 @@ export default class FragmentsModalControler extends React.Component {
     };
 
     return api
-      .post(
-        `${API_URL}/story/${values.storyId}/content/${values.contentId}/fragments`,
-        fragment
-      )
+      .post(`${API_URL}/content/${values.contentId}/fragments`, fragment)
       .then(() => {
         this.props.shouldRefetch();
         this.closeModal();

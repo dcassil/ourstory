@@ -18,6 +18,14 @@ export default class FragmentsModalControler extends React.Component {
       this.loadModalDataAndOpen();
     }
   }
+  refetch = () => {
+    this.setState(
+      { loaded: false, loading: true, shouldRefetchStory: true },
+      () => {
+        this.loadModalDataAndOpen();
+      }
+    );
+  };
   loadModalDataAndOpen = () => {
     let storyId = this.props.match.params.id;
     let id = this.props.match.params.contentId;
@@ -27,25 +35,28 @@ export default class FragmentsModalControler extends React.Component {
     }
 
     api
-      .get(`${API_URL}/story/${storyId}/content/${id}/fragments`)
-      .then(response => {
+      .get(`${API_URL}/content/${id}/fragments`)
+      .then((response) => {
         console.log(response);
         this.setState({
           fragments: response.data,
           loading: false,
           loaded: true,
-          loadedContentId: this.props.match.params.id
+          loadedContentId: this.props.match.params.id,
         });
       })
-      .catch(error => {
+      .catch((error) => {
         this.setState({
-          failMessage: error.response ? error.response.data : error.message
+          failMessage: error.response ? error.response.data : error.message,
         });
       });
     this.setState({ open: true, loading: true });
   };
   closeModal = () => {
     this.setState({ open: false });
+    if (this.state.shouldRefetchStory) {
+      this.props.shouldRefetch();
+    }
     this.props.history.push(`/story/${this.props.match.params.id}`);
   };
   render() {
@@ -56,6 +67,7 @@ export default class FragmentsModalControler extends React.Component {
         fragments={this.state.fragments}
         closeCallback={this.closeModal}
         error={this.state.failMessage}
+        onChange={this.refetch}
       />
     );
   }

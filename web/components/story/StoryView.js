@@ -6,6 +6,8 @@ import styles from "./Story.css";
 import FragmentsModalControler from "./Components/FragmentsModalControler";
 import FragmentEditModalControler from "./Components/FragmentEditModalControler";
 import ContentEditModalControler from "./Components/ContentEditModalControler";
+import Likes from "@components/story/Components/UpVote";
+import Dislikes from "@components/story/Components/DownVote";
 
 import {
   Link,
@@ -134,14 +136,8 @@ export default class WhatsNewView extends React.Component {
           </Feed.Extra>
           {this.state.showMeta ? (
             <Feed.Meta className="os-flex">
-              <Feed.Like>
-                <Icon name="thumbs up" />
-                {upVotes} Likes
-              </Feed.Like>
-              <Feed.Like>
-                <Icon name="thumbs down" />
-                {downVotes} dislike
-              </Feed.Like>
+              <Likes count={upVotes} storyId={this.state.story.id} />
+              <Dislikes count={downVotes} storyId={this.state.story.id} />
             </Feed.Meta>
           ) : null}
         </Feed.Content>
@@ -195,7 +191,12 @@ export default class WhatsNewView extends React.Component {
                 exact
                 path={`${this.props.match.path}/content/:contentId/fragments`}
               >
-                {(props) => <FragmentsModalControler {...props} />}
+                {(props) => (
+                  <FragmentsModalControler
+                    {...props}
+                    shouldRefetch={this.shouldRefetch}
+                  />
+                )}
               </Route>
               <Route
                 exact

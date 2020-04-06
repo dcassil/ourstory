@@ -28,7 +28,7 @@ export default class FragmentsModalControler extends React.Component {
     }
 
     api
-      .get(`${API_URL}/story/${storyId}/content/${id}/fragments`)
+      .get(`${API_URL}/content/${id}/fragments`)
       .then((response) => {
         console.log(response);
         this.setState({
@@ -51,7 +51,7 @@ export default class FragmentsModalControler extends React.Component {
   };
   onSave = (values) => {
     let user = Authenticator.getAccount();
-    let fragment = {
+    let content = {
       storyId: this.props.match.params.id,
       author: { id: user.id, displayName: user.displayName },
       fragment: values.fragment,
@@ -59,7 +59,7 @@ export default class FragmentsModalControler extends React.Component {
     };
 
     return api
-      .post(`${API_URL}/story/${this.props.match.params.id}/content/`, fragment)
+      .post(`${API_URL}/story/${this.props.match.params.id}/content`, content)
       .then(() => {
         this.props.shouldRefetch();
         this.closeModal();

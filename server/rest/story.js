@@ -8,6 +8,7 @@ const exception = require("../services/exception");
 const storyHelpers = require("./storyHelpers");
 
 const requireAuthentication = auth.requireAuthentication;
+const validateContentOwner = auth.validateContentOwner;
 
 /**
  * schema
@@ -19,44 +20,44 @@ const requireAuthentication = auth.requireAuthentication;
  * content: [StoryContent]
  * **/
 
-router.get("/", function(req, res) {
+router.get("/", function (req, res) {
   dbService
     .get()
     .get("story")
-    .then(story => res.json(story));
+    .then((story) => res.json(story));
 });
 
-router.get("/:id", function(req, res) {
+router.get("/:id", function (req, res) {
   let id = req.params.id;
 
   dbService
     .get()
     .get("story", { id })
-    .then(story =>
+    .then((story) =>
       dbService
         .get()
         .search("storyContent", { storyId: id })
-        .then(content => res.json({ ...story, content }))
+        .then((content) => res.json({ ...story, content }))
     )
-    .catch(e => exception.general(e, res));
+    .catch((e) => exception.general(e, res));
 });
 
-router.get("/:id/content", function(req, res) {
+router.get("/:id/content", function (req, res) {
   dbService
     .get()
     .get("storyContent", { storyId: req.params.id })
-    .then(storyContent => res.json(storyContent))
-    .catch(e => exception.general(e, res));
+    .then((storyContent) => res.json(storyContent))
+    .catch((e) => exception.general(e, res));
 });
 
 router.post("/", requireAuthentication);
-router.post("/", function(req, res) {
+router.post("/", function (req, res) {
   let newStory = storyHelpers.getStoryDataFromBody(req.body);
 
   dbService
     .get()
     .get("story", { title: newStory.title })
-    .then(story => {
+    .then((story) => {
       if (story) {
         logger.error("create new story: title existed");
         res.status(400).send("story title existed");
@@ -66,7 +67,7 @@ router.post("/", function(req, res) {
       dbService
         .get()
         .post("story", newStory)
-        .then(result => {
+        .then((result) => {
           storyHelpers
             .saveNewContentAndFragment(
               result.id,
@@ -78,16 +79,66 @@ router.post("/", function(req, res) {
               res.json(result);
             });
         })
-        .catch(e => exception.general(e, res));
+        .catch((e) => exception.general(e, res));
     });
 });
 
-router.patch("/", requireAuthentication);
-router.patch("/", function(req, res) {
+router.post("/:id/upvote", requireAuthentication);
+router.post("/:id/upvote", function (req, res) {
   dbService
     .get()
     .get("story", { id: req.body.id })
-    .then(story => {
+    .then((story) => {
+      dbService
+        .get()
+        .patch("story", { upVotes: story.upVotes.push(req.user.id) })
+        .then((story) => {
+          storyHelpers.evaluateContentVotes(
+            req.body.contentId,
+            req.body.id,
+            "up"
+          );
+          res.json(story);
+        });
+    });
+});
+
+router.post("/:id/downvote", requireAuthentication);
+router.post("/:id/downvote", function (req, res) {
+  dbService
+    .get()
+    .get("story", { id: req.body.id })
+    .then((story) => {
+      if (story.downVotes.includes(req.user.id)) {
+        res
+          .status(403)
+          .send(
+            new Error(
+              "You may only vote once per story, however you can change down vote to an upvote"
+            )
+          );
+      }
+      dbService
+        .get()
+        .patch("story", { downvotes: story.downvotes.push(req.user.id) })
+        .then((story) => {
+          storyHelpers.evaluateContentVotes(
+            req.body.contentId,
+            req.body.id,
+            "down"
+          );
+          res.json(story);
+        });
+    })
+    .catch((error) => res.status(500).send(error));
+});
+
+router.patch("/", requireAuthentication);
+router.patch("/", function (req, res) {
+  dbService
+    .get()
+    .get("story", { id: req.body.id })
+    .then((story) => {
       getStoryAuth(req, story);
 
       dbService
@@ -98,22 +149,23 @@ router.patch("/", function(req, res) {
           {
             title: req.body.title,
             seed: req.body.seed,
-            lastModified: new Date().getTime()
+            lastModified: new Date().getTime(),
           }
         )
         .then(() => res.sendStatus(200));
-    });
+    })
+    .catch((error) => res.status(500).send(error));
 });
 
 router.delete("/", requireAuthentication);
-router.delete("/:id", function(req, res) {
+router.delete("/:id", function (req, res) {
   let story = dbService.get().get("story", { id: req.body.id });
 
   getStoryAuth(req, story);
   story
     .delete()
     .then(() => res.sendStatus(200))
-    .catch(error => res.status(500).send(error));
+    .catch((error) => res.status(500).send(error));
 
   // .delete("accounts", { username: req.params.id })
   // .then(() => res.sendStatus(200))
@@ -124,7 +176,7 @@ let getStoryAuth = (req, story) => {
   let storyAuthData = {
     exists: story !== undefined,
     isAuthor: story.author === req.user.id,
-    isDeletable: story.fragments.length > 1
+    isDeletable: story.fragments.length > 1,
   };
 
   if (!storyAuthData.exists) {

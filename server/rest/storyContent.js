@@ -4,6 +4,7 @@ const dbService = require("../services/db");
 const auth = require("../services/auth");
 const exception = require("../services/exception");
 const router = require("express").Router();
+const storyHelpers = require("./storyHelpers");
 
 const requireAuthentication = auth.requireAuthentication;
 /**
@@ -15,7 +16,7 @@ const requireAuthentication = auth.requireAuthentication;
  * fragments: [StoryContentFragment.id]
  * **/
 
-router.get("/:storyId/content", function (req, res) {
+router.get("/", function (req, res) {
   dbService
     .get()
     .get("storyContent", { id: req.params.id })
@@ -23,8 +24,18 @@ router.get("/:storyId/content", function (req, res) {
     .catch((e) => exception.general(e, res));
 });
 
-router.post("/:storyId/content", requireAuthentication);
-router.post("/:storyId/content", function (req, res) {
+router.get("/:contentId/fragments", function (req, res) {
+  dbService
+    .get()
+    .search("storyContentFragment", {
+      storyContentId: req.params.contentId,
+    })
+    .then((fragments) => res.json(storyHelpers.sortByVotes(fragments)))
+    .catch((e) => exception.general(e, res));
+});
+
+router.post("/content", requireAuthentication);
+router.post("/content", function (req, res) {
   let storyContent = req.body;
 
   dbService
@@ -56,6 +67,69 @@ router.post("/:storyId/content", function (req, res) {
               res.json({ ...savedContent, ...result })
             )
           )
+        );
+    })
+    .catch((e) => exception.general(e, res));
+});
+
+router.post("/:contentId/fragments", requireAuthentication);
+router.post("/:contentId/fragments", function (req, res) {
+  let fragment = req.body;
+
+  dbService
+    .get()
+    .get("storyContent", { id: req.params.contentId })
+    .then((storyContent) => {
+      if (!storyContent) {
+        let message = "We could not find the storyContent";
+
+        exception.log(message);
+        res.status(404).send(message);
+      }
+
+      if (
+        !auth.isAdmin(req) &&
+        storyContent.lastFragment &&
+        storyContent.lastFragment.author.id === req.user.id
+      ) {
+        let message =
+          "You can not wrtie two fragments, back to back, on the same story";
+
+        exception.log(message);
+        res.status(403).send(message);
+      }
+
+      dbService
+        .get()
+        .post("storyContentFragment", {
+          // save fragment
+          author: fragment.author,
+          fragment: fragment.fragment,
+          storyContentId: storyContent.id,
+          upVotes: [],
+          downVotes: [],
+          lastModified: new Date().getTime(),
+          createdDate: new Date().getTime(),
+        })
+        .then((savedFragment) =>
+          dbService
+            .get()
+            .search("storyContentFragment", { storyContentId: storyContent.id })
+            .then((fragments) =>
+              dbService
+                .get()
+                .patch(
+                  "storyContent",
+                  { id: storyContent.id },
+                  {
+                    lastFragment: savedFragment,
+                    totalFragments: fragments.length,
+                  }
+                )
+                .then((response) => {
+                  res.sendStatus(200);
+                })
+            )
         );
     })
     .catch((e) => exception.general(e, res));
@@ -157,8 +231,8 @@ function saveNewContentFragment(req, storyContentId) {
     author: req.body.author,
     fragment: req.body.fragment,
     storyContentId: storyContentId,
-    upVotes: "0",
-    downVotes: "0",
+    upVotes: [],
+    downVotes: [],
     lastModified: new Date().getTime(),
     createdDate: new Date().getTime(),
   });

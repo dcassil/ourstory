@@ -6,12 +6,25 @@ const fileAsync = require("lowdb/lib/storages/file-async");
 const logger = require("../../logger")(module);
 
 const DEFAULT_SCHEMA = {
-  accounts: [],
+  accounts: [
+    {
+      id: "1",
+      username: "me@danielcassil.com",
+      displayName: "Daniel Cassil",
+      password: "myRansom0811",
+      roles: ["USER", "ADMIN"],
+      votes: {
+        up: [],
+        down: [],
+      },
+      abuseMarks: [],
+    },
+  ],
   links: [],
   settings: {},
   story: [],
   storyContent: [],
-  storyContentFragment: []
+  storyContentFragment: [],
 };
 
 class LowDb {
@@ -20,7 +33,7 @@ class LowDb {
 
     logger.info("Init database LowDb: " + config.databaseFileName);
     this.lowDb = low(config.databaseFileName, {
-      storage: fileAsync
+      storage: fileAsync,
     });
 
     this.lowDb.defaults(DEFAULT_SCHEMA).write();
@@ -29,10 +42,7 @@ class LowDb {
   get(type, match) {
     return new Promise((resolve, reject) => {
       if (match) {
-        let value = this.lowDb
-          .get(type)
-          .find(match)
-          .value();
+        let value = this.lowDb.get(type).find(match).value();
 
         if (value) resolve(value);
         else reject(404);
@@ -44,12 +54,7 @@ class LowDb {
 
   search(type, match) {
     return new Promise((resolve, reject) => {
-      resolve(
-        this.lowDb
-          .get(type)
-          .filter(match)
-          .value()
-      );
+      resolve(this.lowDb.get(type).filter(match).value());
     });
   }
 
@@ -108,27 +113,15 @@ class LowDb {
 
   patch(type, match, item) {
     return new Promise((resolve, reject) => {
-      this.lowDb
-        .get(type)
-        .find(match)
-        .assign(item)
-        .write();
+      this.lowDb.get(type).find(match).assign(item).write();
       resolve(item);
     });
   }
 
   delete(type, match) {
     return new Promise((resolve, reject) => {
-      if (
-        this.lowDb
-          .get(type)
-          .find(match)
-          .value()
-      ) {
-        this.lowDb
-          .get(type)
-          .remove(match)
-          .write();
+      if (this.lowDb.get(type).find(match).value()) {
+        this.lowDb.get(type).remove(match).write();
         resolve();
       } else {
         reject("Item not found");
