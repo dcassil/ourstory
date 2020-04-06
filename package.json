@@ -14,7 +14,8 @@
     "webdev": "export NODE_ENV=development",
     "build:web": "export NODE_ENV=production && rimraf web/dist && webpack -p --config web/webpack.prod.config.js --progress --profile --colors",
     "prestart": "npm install",
-    "start": "export NODE_ENV=production && node index"
+    "start": "export NODE_ENV=production && node index",
+    "build": "export NODE_ENV=production && rimraf web/dist && webpack -p --config web/webpack.prod.config.js --progress --profile --colors"
   },
   "dependencies": {
     "axios": "^0.19.2",
