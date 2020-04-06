@@ -8,6 +8,7 @@ class Server {
   constructor(config) {
     this.config = config;
 
+    console.log("!!!!!!!!!!!!!!!!!11", config);
     logger.info("Creating server for " + config.env);
     logger.info("   Host:          " + config.host);
     logger.info("   Port:          " + config.port);
