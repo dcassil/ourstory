@@ -2,9 +2,9 @@ import React from "react";
 import { connect } from "react-redux";
 import { appLoaded } from "@store/actions/stories";
 import { stories } from "@store/selectors";
-import api from "@services/api";
 import StoryCard from "@components/story/Components/StoryCard";
 import NewStoryButton from "@components/home/whatsNew/NewStoryButton";
+import Loader from "@components/global/Loader";
 import { Container, Card } from "semantic-ui-react";
 
 class WhatsNewView extends React.Component {
@@ -26,12 +26,18 @@ class WhatsNewView extends React.Component {
   };
   render() {
     const { activeTeaser } = this.state;
+    const { loading, data } = this.props.stories || {};
+
+    if (loading) {
+      return <Loader />;
+    }
+
     return (
       <Container text>
         <Card.Group>
           {console.log(this.props.stories)}
-          {this.props.stories && this.props.stories.length > 0
-            ? this.props.stories.map((story) => {
+          {data && data.length > 0
+            ? data.map((story) => {
                 let active = activeTeaser === story.id;
 
                 return (

@@ -1,9 +1,12 @@
 import React from "react";
+import { connect } from "react-redux";
+import { fragmentPanelOpened } from "@store/actions/stories";
+import { fragments } from "@store/selectors";
 import api from "@services/api";
 // import Authenticator from "../Authenticator";
 import FragmentModal from "./FragmentsModal";
 
-export default class FragmentsModalControler extends React.Component {
+class FragmentsModalControler extends React.Component {
   constructor(props) {
     super(props);
     console.log("fragment props", props);
@@ -72,3 +75,7 @@ export default class FragmentsModalControler extends React.Component {
     );
   }
 }
+
+export default connect(fragments, { fragmentPanelOpened })(
+  FragmentsModalControler
+);

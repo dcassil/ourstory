@@ -1,4 +1,5 @@
 import React from "react";
+import { connect } from "react-redux";
 import api from "@services/api";
 import Authenticator from "../Authenticator";
 import FragmentModal from "./Components/FragmentsModal";
@@ -8,7 +9,8 @@ import FragmentEditModalControler from "./Components/FragmentEditModalControler"
 import ContentEditModalControler from "./Components/ContentEditModalControler";
 import Likes from "@components/story/Components/UpVote";
 import Dislikes from "@components/story/Components/DownVote";
-
+import { storySelected } from "@store/actions/stories";
+import { stories } from "@store/selectors";
 import {
   Link,
   Redirect,
@@ -32,7 +34,7 @@ import {
   Checkbox,
 } from "semantic-ui-react";
 
-export default class WhatsNewView extends React.Component {
+class StoryView extends React.Component {
   constructor(props) {
     super(props);
     this.state = { loading: true, fragments: [], showMeta: false };
@@ -42,17 +44,7 @@ export default class WhatsNewView extends React.Component {
     this.fetch();
   }
   fetch() {
-    api
-      .get(`${API_URL}/story/${this.id}`)
-      .then((response) => {
-        console.log(response);
-        this.setState({ story: response.data, loading: false });
-      })
-      .catch((error) => {
-        this.setState({
-          failMessage: error.response ? error.response.data : error.message,
-        });
-      });
+    this.props.storySelected(this.id);
   }
   shouldRefetch = () => {
     this.fetch();
@@ -87,7 +79,7 @@ export default class WhatsNewView extends React.Component {
     let downVotes = data.topFragment.downVotes.length;
     return (
       <div key={data.id} className={styles.flexRow}>
-        {this.renderContent(author, createdDate, text, upVotes, downVotes)}
+        {this.renderContent(data.topFragment)}
         <Dropdown icon="bars">
           <Dropdown.Menu>
             <Dropdown.Header content="something" />
@@ -119,7 +111,18 @@ export default class WhatsNewView extends React.Component {
   };
   toggleMeta = () =>
     this.setState((prevState) => ({ showMeta: !prevState.showMeta }));
-  renderContent(author, createdDate, text, upVotes, downVotes) {
+  renderContent({
+    author,
+    createdDate,
+    seed,
+    fragment,
+    id,
+    storyId,
+    upVotes,
+    downVotes,
+  }) {
+    let isStorySeed = storyId === undefined;
+
     return (
       <Feed.Event>
         <Feed.Content>
@@ -132,12 +135,16 @@ export default class WhatsNewView extends React.Component {
             </Feed.Summary>
           ) : null}
           <Feed.Extra text>
-            <p>{text}</p>
+            <p>{seed || fragment}</p>
           </Feed.Extra>
-          {this.state.showMeta ? (
+          {this.state.showMeta && !isStorySeed ? (
             <Feed.Meta className="os-flex">
-              <Likes count={upVotes} storyId={this.state.story.id} />
-              <Dislikes count={downVotes} storyId={this.state.story.id} />
+              <Likes count={upVotes.length} storyId={this.id} contentId={id} />
+              <Dislikes
+                count={downVotes.length}
+                storyId={this.id}
+                contentId={id}
+              />
             </Feed.Meta>
           ) : null}
         </Feed.Content>
@@ -148,29 +155,21 @@ export default class WhatsNewView extends React.Component {
   log(props) {
     console.log("log", props);
   }
-  renderSeed = (story) => {
-    return this.renderContent(
-      story.author,
-      story.createdDate,
-      story.seed,
-      story.upVotes,
-      story.downVotes
-    );
-  };
   render() {
+    const { loading, selected, error } = this.props.stories || {};
     console.log(this.props);
     // console.log(match);
-    if (this.state.loading) {
+    if (loading) {
       return (
         <Dimmer active>
           <Loader />
         </Dimmer>
       );
     }
-    if (this.state.failMessage) {
+    if (error) {
       return <div>{error.message}</div>;
     }
-    if (!this.state.story) {
+    if (!selected) {
       return <div>No Story Found</div>;
     }
 
@@ -210,13 +209,10 @@ export default class WhatsNewView extends React.Component {
                 )}
               </Route>
             </Switch>
-            {/* <FragmentModal
-          open={this.state.isModalOpen}
-          fragments={this.state.fragments}
-          closeCallback={this.closeModal}
-        /> */}
             <Container className={styles.flexRow}>
-              <Header as="h2">{this.state.story.title}</Header>
+              <Header as="h2">{selected.title}</Header>
+              <Likes count={selected.upVotes.length} storyId={this.id} />
+              <Dislikes count={selected.downVotes.length} storyId={this.id} />
               <Checkbox
                 toggle
                 label="Show Details"
@@ -226,10 +222,10 @@ export default class WhatsNewView extends React.Component {
             </Container>
 
             <Container>
-              {this.renderSeed(this.state.story)}
-              {this.state.story.content.map((c) => this.renderFragment(c))}
+              {this.renderContent(this.props.stories.selected || {})}
+              {selected.content.map((c) => this.renderFragment(c))}
             </Container>
-            <Link to={`/story/${this.state.story.id}/content/new`}>
+            <Link to={`/story/${selected.id}/content/new`}>
               Add to this story
             </Link>
           </Card.Content>
@@ -238,3 +234,5 @@ export default class WhatsNewView extends React.Component {
     );
   }
 }
+
+export default connect(stories, { storySelected })(StoryView);
