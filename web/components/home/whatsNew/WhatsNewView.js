@@ -1,10 +1,13 @@
 import React from "react";
+import { connect } from "react-redux";
+import { appLoaded } from "@store/actions/stories";
+import { stories } from "@store/selectors";
 import api from "@services/api";
 import StoryCard from "@components/story/Components/StoryCard";
 import NewStoryButton from "@components/home/whatsNew/NewStoryButton";
 import { Container, Card } from "semantic-ui-react";
 
-export default class WhatsNewView extends React.Component {
+class WhatsNewView extends React.Component {
   constructor(props) {
     super(props);
 
@@ -12,9 +15,7 @@ export default class WhatsNewView extends React.Component {
   }
   componentDidMount() {
     console.log("component mounted");
-    api.get(API_URL + "/story").then((response) => {
-      this.setState({ stories: response.data });
-    });
+    this.props.appLoaded();
   }
   handleAccoridanClick = (id) => {
     let activeTeaser;
@@ -28,8 +29,9 @@ export default class WhatsNewView extends React.Component {
     return (
       <Container text>
         <Card.Group>
-          {this.state.stories && this.state.stories.length > 0
-            ? this.state.stories.map((story) => {
+          {console.log(this.props.stories)}
+          {this.props.stories && this.props.stories.length > 0
+            ? this.props.stories.map((story) => {
                 let active = activeTeaser === story.id;
 
                 return (
@@ -48,3 +50,5 @@ export default class WhatsNewView extends React.Component {
     );
   }
 }
+
+export default connect(stories, { appLoaded })(WhatsNewView);
