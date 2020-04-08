@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { appLoaded } from "@store/actions/stories";
 import { stories } from "@store/selectors";
 import StoryCard from "@components/story/Components/StoryCard";
-import NewStoryButton from "@components/home/whatsNew/NewStoryButton";
+import NewStoryButton from "@components/story/Components/PrimaryButton";
 import Loader from "@components/global/Loader";
 import { Container, Card } from "semantic-ui-react";
 
@@ -33,7 +33,7 @@ class WhatsNewView extends React.Component {
     }
 
     return (
-      <Container text>
+      <Container fluid text className="stretch">
         <Card.Group>
           {console.log(this.props.stories)}
           {data && data.length > 0
@@ -50,7 +50,7 @@ class WhatsNewView extends React.Component {
                 );
               })
             : null}
-          <NewStoryButton />
+          <NewStoryButton path="/story/new" label="Create A New Story" />
         </Card.Group>
       </Container>
     );

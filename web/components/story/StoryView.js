@@ -15,6 +15,7 @@ import { stories } from "@store/selectors";
 import { Link, Switch, Route } from "react-router-dom";
 import StoryViewFragment from "./StoryViewFragment";
 import StoryViewContent from "./StoryViewContent";
+import NewStoryButton from "@components/story/Components/PrimaryButton";
 import {
   Header,
   Container,
@@ -47,7 +48,7 @@ class StoryView extends React.Component {
     const { loading, selected, error } = this.props.stories || {};
     console.log(this.props);
     // console.log(match);
-    if (loading) {
+    if (loading || !selected) {
       return (
         <Dimmer active>
           <Loader />
@@ -57,12 +58,9 @@ class StoryView extends React.Component {
     if (error) {
       return <div>{error.message}</div>;
     }
-    if (!selected) {
-      return <div>No Story Found</div>;
-    }
 
     return (
-      <Container text>
+      <Container text className="stretch">
         <Card fluid className={styles.storyCard}>
           <Card.Header>
             <Link to="/">back</Link>
@@ -84,7 +82,7 @@ class StoryView extends React.Component {
                 {(props) => (
                   <FragmentsModalControler
                     {...props}
-                    shouldRefetch={this.fetch}
+                    beforeClose={this.fetch}
                   />
                 )}
               </Route>
@@ -95,7 +93,7 @@ class StoryView extends React.Component {
                 {(props) => (
                   <FragmentEditModalControler
                     {...props}
-                    shouldRefetch={this.shouldRefetch}
+                    shouldRefetch={this.fetch}
                   />
                 )}
               </PrivateRoute>
@@ -138,9 +136,10 @@ class StoryView extends React.Component {
               ))}
             </Container>{" "}
             {this.isLoggedIn ? (
-              <Link to={`/story/${selected.id}/content/new`}>
-                Add to this story
-              </Link>
+              <NewStoryButton
+                path={`/story/${selected.id}/content/new`}
+                label="Add to this story"
+              />
             ) : null}
           </Card.Content>
         </Card>

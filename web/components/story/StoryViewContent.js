@@ -29,7 +29,7 @@ export default function renderContent({
           </Feed.Summary>
         ) : null}
         <Feed.Extra text>
-          <p>{seed || fragment}</p>
+          <p className="indent">{seed || fragment}</p>
         </Feed.Extra>
         {showMeta && !isStorySeed ? (
           <Feed.Meta className="os-flex">

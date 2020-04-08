@@ -32,13 +32,29 @@ export default class StoryViewFragment extends React.Component {
               </Label>
             </Dropdown.Item>
             {data.isLoggedIn ? (
-              <Dropdown.Item name="spam">
-                <Link
-                  to={`${this.props.match.url}/content/${data.id}/fragments/new`}
-                >
-                  Add Alternates
-                </Link>
-              </Dropdown.Item>
+              <React.Fragment>
+                <Dropdown.Item name="Add">
+                  <Link
+                    to={`${this.props.match.url}/content/${data.id}/fragments/new`}
+                  >
+                    Add Alternates
+                  </Link>
+                </Dropdown.Item>
+                <Dropdown.Item name="indent">
+                  <Link
+                    to={`${this.props.match.url}/content/${data.id}/fragments/new`}
+                  >
+                    Sugest Indenting this paragrah
+                  </Link>
+                </Dropdown.Item>
+                <Dropdown.Item name="endChapter">
+                  <Link
+                    to={`${this.props.match.url}/content/${data.id}/fragments/new`}
+                  >
+                    Sugest Chapter End
+                  </Link>
+                </Dropdown.Item>
+              </React.Fragment>
             ) : null}
           </Dropdown.Menu>
         </Dropdown>

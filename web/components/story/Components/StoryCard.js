@@ -7,12 +7,14 @@ export default function StoryCard({ story, active, onExpand }) {
   return (
     <Card fluid className={styles.storyCard}>
       <Card.Content>
-        <Card.Header>{story.title}</Card.Header>
+        <Card.Header>
+          <Link to={`/story/${story.id}`}>{story.title}</Link>
+        </Card.Header>
       </Card.Content>
       <Card.Content>
         <Accordion>
           <Accordion.Title onClick={onExpand} active={active}>
-            {story.seed}{" "}
+            <p className="indent">{story.seed}</p>
             {active ? <Icon name="angle up" /> : <Icon name="angle down" />}
           </Accordion.Title>
           <Accordion.Content active={active}>

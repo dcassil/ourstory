@@ -33,6 +33,7 @@ class FragmentsModalControler extends React.Component {
     // if (this.state.shouldRefetchStory) {
     //   this.props.shouldRefetch();
     // }
+    this.props.beforeClose();
     this.props.history.push(`/story/${this.props.match.params.id}`);
   };
   render() {

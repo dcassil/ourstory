@@ -34,44 +34,6 @@ router.get("/:contentId/fragments", function (req, res) {
     .catch((e) => exception.general(e, res));
 });
 
-router.post("/content", requireAuthentication);
-router.post("/content", function (req, res) {
-  let storyContent = req.body;
-
-  dbService
-    .get()
-    .get("story", { id: req.body.storyId })
-    .then((story) => {
-      if (!story) {
-        let message = "We could not find the story";
-
-        exception.log(message);
-        res.status(404).send(message);
-      }
-
-      if (
-        story.lastFragment &&
-        story.lastFragment.author.id === req.body.user.id
-      ) {
-        let message =
-          "You can not wrtie two fragments, back to back, on the same story";
-
-        exception.log(message);
-        res.status(403).send(message);
-      }
-
-      return saveNewStoryContent(storyContent) // save storyContent
-        .then((savedContent) =>
-          saveNewContentFragment(req, savedContent.id).then((savedFragment) =>
-            patchStoryContent(savedContent.id, savedFragment).then((result) =>
-              res.json({ ...savedContent, ...result })
-            )
-          )
-        );
-    })
-    .catch((e) => exception.general(e, res));
-});
-
 router.post("/:contentId/fragments", requireAuthentication);
 router.post("/:contentId/fragments", function (req, res) {
   let fragment = req.body;
@@ -209,34 +171,6 @@ let getStoryAuth = (req, story) => {
 };
 
 module.exports = router;
-function patchStoryContent(id, fragment) {
-  return dbService.get().patch(
-    // update storyContent with fragment details.
-    "storyContent",
-    { id },
-    {
-      topFragment: fragment,
-      lastFragment: fragment,
-    }
-  );
-}
-
-function saveNewStoryContent(storyContent) {
-  return dbService.get().post("storyContent", storyContent);
-}
-
-function saveNewContentFragment(req, storyContentId) {
-  return dbService.get().post("storyContentFragment", {
-    // save fragment
-    author: req.body.author,
-    fragment: req.body.fragment,
-    storyContentId: storyContentId,
-    upVotes: [],
-    downVotes: [],
-    lastModified: new Date().getTime(),
-    createdDate: new Date().getTime(),
-  });
-}
 
 // module.exports = {
 //   post
