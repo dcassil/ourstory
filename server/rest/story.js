@@ -120,7 +120,7 @@ router.post("/:id/downvote", function (req, res) {
       }
       dbService
         .get()
-        .patch("story", { downvotes: story.downvotes.push(req.user.id) })
+        .patch("story", { downvotes: story.downVotes.push(req.user.id) })
         .then((story) => {
           storyHelpers.evaluateContentVotes(
             req.body.contentId,

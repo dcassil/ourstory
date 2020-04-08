@@ -14,7 +14,7 @@ class LoginView extends React.Component {
       username: "",
       password: "",
       loginFail: false,
-      loginFailMessage: ""
+      loginFailMessage: "",
     };
   }
 
@@ -31,10 +31,10 @@ class LoginView extends React.Component {
       Authenticator.login(
         this.state.username,
         this.state.password,
-        function() {
+        function () {
           that.setState({ loginFail: false });
         },
-        function(error) {
+        function (error) {
           let msg = "";
           if (error.response) {
             if (error.response.status == 429) {
@@ -56,7 +56,15 @@ class LoginView extends React.Component {
 
   render() {
     if (Authenticator.isLoggedIn()) {
-      return <Redirect to={{ pathname: "/" }} />;
+      return (
+        <Redirect
+          to={{
+            pathname: this.props.location.state
+              ? this.props.location.state.from.pathname
+              : "/",
+          }}
+        />
+      );
     } else {
       return (
         <div className="container">

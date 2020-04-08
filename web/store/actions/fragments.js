@@ -5,11 +5,11 @@ export const fragmentPanelOpened = (contentId) => {
   return (dispatch) => {
     dispatch(fragmentsRequested());
     return api
-      .get(API_URL + "/story")
+      .get(`${API_URL}/content/${contentId}/fragments`)
       .then((response) => {
-        dispatch(fragmentsFetched(response.data));
+        dispatch(fragmentsFetched({ contentId, data: response.data }));
       })
-      .catch((error) => dispatch(fragmentsError(error)));
+      .catch(fragmentsError());
   };
 };
 

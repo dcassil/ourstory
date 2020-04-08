@@ -20,7 +20,6 @@ import globalStyles from "./global.css";
 
 Authenticator.setRules({
   "/admin": ["ADMIN"],
-  "/story/new": ["ADMIN", "USER"],
 });
 
 export default (

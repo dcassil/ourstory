@@ -2,7 +2,7 @@ import React, { PropTypes } from "react";
 import { Route, Redirect } from "react-router-dom";
 import Authenticator from "./Authenticator";
 
-export default ({ component, ...rest }) => (
+export default ({ component, checkRoles, children, ...rest }) => (
   <Route
     {...rest}
     render={function (props) {
@@ -17,15 +17,20 @@ export default ({ component, ...rest }) => (
         );
       }
 
-      if (!Authenticator.isAuthorized(props.location.pathname)) {
+      if (checkRoles && !Authenticator.isAuthorized(props.location.pathname)) {
         return (
-          <div>
-            <h1>Access denied</h1>
-          </div>
+          <Redirect
+            to={{
+              pathname: "/forbiden",
+              state: { from: props.location },
+            }}
+          />
         );
       }
 
-      return React.createElement(component, props);
+      return component
+        ? React.createElement(component, props)
+        : children(props);
     }}
   />
 );

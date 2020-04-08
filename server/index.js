@@ -26,7 +26,14 @@ class Server {
         "Access-Control-Allow-Headers",
         "Origin, X-Requested-With, Content-Type, Accept, Authorization"
       );
-      next();
+      if (config.env === "development") {
+        console.log("in dev, fake api latency timeout in use");
+        setTimeout(() => {
+          next();
+        }, 500);
+      } else {
+        next();
+      }
     });
 
     this.app.options("*", function (req, res, next) {

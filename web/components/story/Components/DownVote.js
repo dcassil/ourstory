@@ -11,7 +11,13 @@ export default function StoryCard({
 }) {
   return (
     <Feed.Like
-      onClick={() => postVote(storyId, contentId, fragmentId).then(onChange)}
+      onClick={() =>
+        postVote(storyId, contentId, fragmentId).then(() => {
+          if (typeof onChange === "function") {
+            onChange();
+          }
+        })
+      }
     >
       <Icon name="thumbs down" />
       {count} Dislikes
