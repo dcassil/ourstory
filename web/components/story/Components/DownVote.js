@@ -19,8 +19,8 @@ export default function StoryCard({
         })
       }
     >
-      <Icon name="thumbs down" />
-      {count} Dislikes
+      <Icon small name="thumbs down" />
+      {count}
     </Feed.Like>
   );
 }

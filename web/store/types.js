@@ -13,4 +13,9 @@ export default {
     FETCHED: "fragments_fetched",
     ERROR: "fragments_error",
   },
+  TAGS: {
+    REQUESTED: "fragments_requested",
+    FETCHED: "fragments_fetched",
+    ERROR: "fragments_error",
+  },
 };

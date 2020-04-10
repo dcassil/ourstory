@@ -52,6 +52,7 @@ class Server {
     this.app.use("/rest/fragments", require("./rest/storyContentFragment"));
     this.app.use("/rest/content", require("./rest/storyContent"));
     this.app.use("/rest/story", require("./rest/story"));
+    this.app.use("/rest/tags", require("./rest/tags"));
     this.app.use(
       "/rest/storyContentFragment",
       require("./rest/storyContentFragment")

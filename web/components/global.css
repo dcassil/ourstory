@@ -34,6 +34,36 @@ body ::-webkit-scrollbar {
   text-indent: 2em;
 }
 
+:global .ui.toggle.checkbox .box:before,
+:global .ui.toggle.checkbox label:before {
+  background: rgb(63, 63, 63) !important;
+}
+
+:global .ui.toggle.checkbox .box:hover::before,
+:global .ui.toggle.checkbox label:hover::before {
+  background-color: rgb(58, 58, 58) !important;
+}
+
+:global .ui.toggle.checkbox .box,
+:global .ui.toggle.checkbox label {
+  color: white !important;
+}
+
+:global .inline {
+  display: inline;
+}
+
+:global p.indent.inline::before {
+  content: "aaa";
+  width: 2em;
+  visibility: hidden;
+}
+:global p.indent.inline::after {
+  content: "a";
+  width: 0.5em;
+  visibility: hidden;
+}
+
 .textBold {
   font-weight: bold;
 }

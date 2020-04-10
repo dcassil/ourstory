@@ -6,6 +6,7 @@ const router = require("express").Router();
 const logger = require("../logger")(module);
 const exception = require("../services/exception");
 const storyHelpers = require("./storyHelpers");
+const tagHelpers = require("./tagHelpers");
 
 const requireAuthentication = auth.requireAuthentication;
 const validateContentOwner = auth.validateContentOwner;
@@ -68,6 +69,7 @@ router.post("/", function (req, res) {
         .get()
         .post("story", newStory)
         .then((result) => {
+          tagHelpers.updateTagsList(newStory.tags);
           storyHelpers
             .saveNewContentAndFragment(
               result.id,

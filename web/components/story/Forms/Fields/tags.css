@@ -1,0 +1,16 @@
+.tagList {
+  max-height: 28px;
+  overflow: auto;
+}
+.tagInputWrapper {
+  margin-bottom: 10px;
+}
+.addedTag {
+  display: inline;
+}
+.removeButton {
+  margin-left: 5px;
+  margin-right: 10px;
+  color: cornflowerblue;
+  cursor: pointer;
+}

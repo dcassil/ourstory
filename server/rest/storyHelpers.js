@@ -127,7 +127,7 @@ function saveNewStoryContent(storyContent) {
 }
 
 function getStoryDataFromBody(body) {
-  const { title, author, seed, createdDate } = body;
+  const { title, author, seed, createdDate, tags } = body;
   return {
     title,
     author,
@@ -136,6 +136,7 @@ function getStoryDataFromBody(body) {
     createdDate,
     upVotes: [],
     downVotes: [],
+    tags,
   };
 }
 

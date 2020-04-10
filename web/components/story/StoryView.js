@@ -23,6 +23,9 @@ import {
   Loader,
   Card,
   Checkbox,
+  Menu,
+  Divider,
+  Segment,
 } from "semantic-ui-react";
 
 class StoryView extends React.Component {
@@ -63,7 +66,37 @@ class StoryView extends React.Component {
       <Container text className="stretch">
         <Card fluid className={styles.storyCard}>
           <Card.Header>
-            <Link to="/">back</Link>
+            <Menu inverted>
+              <Menu.Item>
+                <Link to="/">back</Link>
+              </Menu.Item>
+              <Menu.Menu position="right">
+                <Menu.Item>
+                  <Checkbox
+                    toggle
+                    label="Show Details"
+                    onChange={this.toggleMeta}
+                    checked={this.state.showMeta}
+                  ></Checkbox>
+                </Menu.Item>
+              </Menu.Menu>
+              <Menu.Menu position="right">
+                <Menu.Item>
+                  <Likes
+                    count={selected.upVotes.length}
+                    storyId={this.id}
+                    onChange={this.fetch}
+                  />
+                </Menu.Item>
+                <Menu.Item>
+                  <Dislikes
+                    count={selected.downVotes.length}
+                    storyId={this.id}
+                    onChange={this.fetch}
+                  />
+                </Menu.Item>
+              </Menu.Menu>
+            </Menu>
           </Card.Header>
           <Card.Content>
             <Switch>
@@ -98,43 +131,48 @@ class StoryView extends React.Component {
                 )}
               </PrivateRoute>
             </Switch>
-            <Container className={styles.flexRow}>
-              <Header as="h2">{selected.title}</Header>
-              <Likes
-                count={selected.upVotes.length}
-                storyId={this.id}
-                onChange={this.fetch}
-              />
-              <Dislikes
-                count={selected.downVotes.length}
-                storyId={this.id}
-                onChange={this.fetch}
-              />
-              <Checkbox
-                toggle
-                label="Show Details"
-                onChange={this.toggleMeta}
-                checked={this.state.showMeta}
-              ></Checkbox>
+            <Container className={styles.storyTitle}>
+              <Header as="h1" icon textAlign="center">
+                {selected.title}
+              </Header>
             </Container>
+            <Divider />
             <Container>
-              <StoryViewContent
-                showMeta={this.state.showMeta}
-                onChange={this.fetch}
-                storyId={this.id}
-                {...(this.props.stories.selected || {})}
-              />
-              {selected.content.map((c) => (
-                <StoryViewFragment
-                  key={c.id}
-                  showMeta={this.state.showMeta}
-                  onChange={this.fetch}
-                  isLoggedIn={this.isLoggedIn}
-                  {...this.props}
-                  {...c}
-                />
-              ))}
-            </Container>{" "}
+              {this.state.showMeta ? (
+                <React.Fragment>
+                  <Segment basic className={styles.storyContentSegment}>
+                    <StoryViewContent
+                      showMeta={this.state.showMeta}
+                      onChange={this.fetch}
+                      // storyId={this.id}
+                      {...(selected || {})}
+                    />
+                  </Segment>
+                  {selected.content.map((c) => (
+                    <StoryViewFragment
+                      key={c.id}
+                      showMeta={this.state.showMeta}
+                      onChange={this.fetch}
+                      isLoggedIn={this.isLoggedIn}
+                      {...this.props}
+                      {...c}
+                    />
+                  ))}
+                </React.Fragment>
+              ) : (
+                <Segment basic className={styles.storyContentSegment}>
+                  <p className="indent inline">{selected.seed}</p>
+                  {selected.content.map((c, index) => (
+                    <p
+                      key={c.id}
+                      className={`inline ${c.indent ? "indent" : ""}`}
+                    >
+                      {c.topFragment.fragment}
+                    </p>
+                  ))}
+                </Segment>
+              )}
+            </Container>
             {this.isLoggedIn ? (
               <NewStoryButton
                 path={`/story/${selected.id}/content/new`}

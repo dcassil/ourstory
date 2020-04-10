@@ -24,3 +24,12 @@
   border: 1px solid #0000000d !important;
   max-height: 600px;
 }
+
+.storyTitle {
+  margin: 30px 0;
+}
+
+.storyContentSegment {
+  padding: 2px !important;
+  margin: 0 !important;
+}

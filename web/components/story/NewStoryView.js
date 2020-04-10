@@ -2,7 +2,7 @@ import React from "react";
 import api from "@services/api";
 import Authenticator from "../Authenticator";
 import styles from "./Story.css";
-
+import Tags from "./Forms/Fields/Tags";
 import { Link, Redirect } from "react-router-dom";
 import {
   Form,
@@ -52,6 +52,7 @@ export default class NewStoryView extends React.Component {
       seed: this.state.values.seed,
       fragment: this.state.values.fragment,
       createdDate: new Date().getTime(),
+      tags: this.state.values.tags,
     };
     let errors = this.validateFragment();
 
@@ -112,6 +113,10 @@ export default class NewStoryView extends React.Component {
   validateFragment = () => {
     let fragment = this.state.values.fragment;
 
+    if (!fragment) {
+      return {};
+    }
+
     if (fragment.length < 50 || fragment.length > 1000) {
       return {
         fragment: {
@@ -124,12 +129,15 @@ export default class NewStoryView extends React.Component {
 
   renderFragmentForm() {
     return (
-      <Form inverted noValidate>
+      <Form
+        inverted
+        noValidate
+        onSubmit={(e) => e.preventDefault() && console.log("hit onsubmit")}
+      >
         <Form.Field
-          required
           control={TextArea}
           key="fragment"
-          label="Fragment"
+          label="Fragment (optional)"
           name="fragment"
           error={this.state.errors.fragment}
           style={{ minHeight: 100 }}
@@ -137,7 +145,8 @@ export default class NewStoryView extends React.Component {
           onChange={(e) => this.handleChange(e.target)}
           placeholder="As the creator, you get to add the first fragment as well, this will help to point your story in the direction you want"
         />
-        <Button type="submit" onClick={this.handleSubmit}>
+        <Tags onChange={this.handleChange} />
+        <Button type="" onClick={this.handleSubmit}>
           Submit
         </Button>
         <Button onClick={() => this.setState({ storySet: false })}>back</Button>

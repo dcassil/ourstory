@@ -25,6 +25,7 @@ const DEFAULT_SCHEMA = {
   story: [],
   storyContent: [],
   storyContentFragment: [],
+  tags: [],
 };
 
 class LowDb {
