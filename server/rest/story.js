@@ -70,6 +70,9 @@ router.post("/", function (req, res) {
         .post("story", newStory)
         .then((result) => {
           tagHelpers.updateTagsList(newStory.tags);
+          if (req.body.fragment.length === 0) {
+            res.json(result);
+          }
           storyHelpers
             .saveNewContentAndFragment(
               result.id,

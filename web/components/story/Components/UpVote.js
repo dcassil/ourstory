@@ -13,7 +13,7 @@ export default function StoryCard({
     <Feed.Like
       onClick={() => postVote(storyId, contentId, fragmentId).then(onChange)}
     >
-      <Icon small name="thumbs up" />
+      <Icon size="small" name="thumbs up" />
       {count}
     </Feed.Like>
   );

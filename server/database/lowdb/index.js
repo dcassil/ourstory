@@ -20,6 +20,7 @@ const DEFAULT_SCHEMA = {
       abuseMarks: [],
     },
   ],
+  abuse: [],
   links: [],
   settings: {},
   story: [],
